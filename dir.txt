@@ -1,0 +1,19 @@
+mlops-sklearn-portfolio/             # ←リポ名は好きなのに
+├─ README.md
+├─ Makefile
+├─ pyproject.toml                     # or requirements.txt
+├─ data/                              # 生データは.gitignore
+│   └─ .gitignore
+├─ notebooks/
+│   └─ 00_explore.ipynb
+├─ src/
+│   ├─ train.py                       # 本番用学習
+│   ├─ smoke.py                       # 煙テスト（数分で終わる）
+│   ├─ features.py                    # 前処理/特徴量
+│   └─ utils.py                       # 共通（seed固定, ログ等）
+├─ api/
+│   └─ app.py                         # FastAPIで推論（任意）
+├─ models/                            # joblib置き場
+├─ artifacts/                         # 指標・cv_results等
+├─ cache/                             # Pipelineキャッシュ
+└─ logs/
