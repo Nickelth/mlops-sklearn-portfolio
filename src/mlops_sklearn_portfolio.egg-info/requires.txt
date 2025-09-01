@@ -1,0 +1,15 @@
+pandas
+scikit-learn
+joblib
+threadpoolctl
+
+[api]
+fastapi
+uvicorn
+
+[dev]
+black
+ruff
+mypy
+pytest
+ipykernel

@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+src/datasets.py
+src/features.py
+src/smoke.py
+src/train.py
+src/utils.py
+src/mlops_sklearn_portfolio.egg-info/PKG-INFO
+src/mlops_sklearn_portfolio.egg-info/SOURCES.txt
+src/mlops_sklearn_portfolio.egg-info/dependency_links.txt
+src/mlops_sklearn_portfolio.egg-info/requires.txt
+src/mlops_sklearn_portfolio.egg-info/top_level.txt
