@@ -1,3 +1,8 @@
+.PHONY: init
+init:
+	python -m pip install -U pip setuptools wheel
+	python -m pip install -e .[dev]
+
 PY := python -u
 TS := $(shell date +%Y%m%d_%H%M%S)
 BLAS := OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1

@@ -20,3 +20,17 @@
     └── utils.py
 
 9 directories, 11 files
+
+.
+├─ api/                  # FastAPI（/health, /predict）
+├─ data/ 
+├─ src/                  # 学習スクリプト・ユーティリティ
+├─ notebooks/
+├─ models/               # joblib成果物
+├─ artifacts/            # summary.json, cv_results.csv, ほか
+├─ logs/                 # 学習ログ（latest.log はシンボリック）
+├─ cache/                # OpenMLキャッシュ（自動生成）
+├─ tests/                # 最小限のユニットテスト
+├─ Makefile
+├─ pyproject.toml
+└─ README.md
