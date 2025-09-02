@@ -3,12 +3,20 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mlops-sklearn-portfolio"
-version = "0.1.0"
-description = "Tabular ML with scikit-learn: pipeline, CV, artifacts, and API skeleton."
-readme = "README.md"
 requires-python = ">=3.10"
-authors = [{ name = "Your Name" }]
+dependencies = [
+  "pandas>=2.2,<3",
+  "scikit-learn>=1.4,<1.6",
+  "joblib>=1.4",
+  "threadpoolctl>=3.5",
+]
+[project.optional-dependencies]
+api = ["fastapi","uvicorn"]
+dev = ["black","ruff","mypy","pytest","ipykernel"]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+py-modules = ["datasets","features","smoke","train","utils"]
 
 # ここが本題：ベース依存（今すぐ必要なやつだけ）
 dependencies = [
@@ -17,23 +25,3 @@ dependencies = [
   "joblib",
   "threadpoolctl",
 ]
-
-# 後日使うものは extras に逃がす（必要になったら選んで入れる）
-[project.optional-dependencies]
-api = [
-  "fastapi",
-  "uvicorn",
-]
-dev = [
-  "black",
-  "ruff",
-  "mypy",
-  "pytest",
-  "ipykernel",
-]
-
-# src直下の .py を“単独モジュール”として配る設定
-[tool.setuptools]
-package-dir = { "" = "src" }
-py-modules = ["datasets", "features", "smoke", "train", "utils"]
-
