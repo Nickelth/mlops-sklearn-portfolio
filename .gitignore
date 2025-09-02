@@ -1,7 +1,11 @@
 venv/
+cache/
 __pycache__/
 *.pyc
 data/
 models/
 artifacts/
 logs/
+/*.egg-info/
+/src/*.egg-info/
+*.egg-info/
