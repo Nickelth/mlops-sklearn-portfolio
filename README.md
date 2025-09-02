@@ -84,11 +84,61 @@ make train-full DS=adult
 make train-full DS=credit-g
 
 # バッチで回す（例: 12h上限×2本）
-nohup bash -lc 'source venv/bin/activate && \
-timeout --signal=INT --kill-after=30s 12h make train-full DS=adult; \
-timeout --signal=INT --kill-after=30s 12h make train-full DS=credit-g' \
->/dev/null 2>&1 &
+# すべての stdout/stderr を 時刻入りで1本のログに集約
+# logs/latest.log にシンボリックリンク
+# Pythonは非バッファ出力、BLASは1スレに固定
+# 各DSの開始/終了/RCを行ごとに記録
+
+nohup bash -lc '
+set -Eeuo pipefail
+umask 077
+mkdir -p logs
+LOG="logs/train-$(date +%Y%m%d_%H%M%S).log"
+ln -sfn "$LOG" logs/latest.log
+
+# ここからの出力は全部ログへ。teeはお好みで（外部出力は捨てられるので -a でファイルだけ残ればOK）
+exec > >(stdbuf -oL -eL tee -a "$LOG") 2>&1
+
+echo "=== START $(date -Is) pid=$$ ==="
+source venv/bin/activate
+export PYTHONUNBUFFERED=1
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
+
+for ds in adult credit-g; do
+  echo "--- DS=$ds start $(date -Is) ---"
+  if timeout --signal=INT --kill-after=30s 12h make train-full DS="$ds"; then
+    rc=$?
+    echo "--- DS=$ds OK rc=$rc end=$(date -Is) ---"
+  else
+    rc=$?
+    echo "--- DS=$ds FAIL rc=$rc end=$(date -Is) ---"
+  fi
+done
+
+echo "=== END $(date -Is) ==="
+' >/dev/null 2>&1 &
+
 ```
+
+
+#### 監査用コマンド
+
+```bash
+tail -f logs/latest.log
+# 区切りは "DS=<name> start/end" をgrepすれば一目
+grep -nE -- "--- DS=" logs/latest.log
+```
+
+#### サスペンド制御
+
+`mask`でサスペンドを封印。`unmask`で封印解除。
+
+```bash
+sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+
+sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target
+```
+
 
 **所要時間の目安（i7-9700/32GB, GPUなし）**
 
