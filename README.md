@@ -180,6 +180,37 @@ docker run --rm -p 8000:8000 mlops-api
 | builtin\_breast\_cancer | fast | 0.9924 | 0.9649 | `{'clf__learning_rate': 0.2, 'clf__max_depth': 8, 'clf__max_leaf_nodes': 63}`  |           2 |
 | openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}`  |          18 |
 | openml\_credit\_g       | full | 0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` |           2 |
+| openml\_adult     | full |  0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127}`  | 19            |
+| openml\_credit\_g | full |  0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127}` | 3             |
+
+
+#### 直近結果(2525-09-03)
+```bash
+grep -h "^\[RESULT\]" logs/train-*.log | tail -n 5
+[RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=2
+[RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=19
+[RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=19
+[RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=3
+[RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=3
+```
+
+```bash
+grep -h "^\[RESULT\]" logs/train-*.log |
+  awk '{ds=$3; auc=$6; acc=$8; for(i=1;i<=NF;i++) if($i ~ /elapsed_sec=/){split($i,a,"="); sec=a[2]} print ds"\t"auc"\t"acc"\t"sec }'
+mode=fast       best={'clf__learning_rate':     'clf__max_depth':       2
+mode=fast       best={'clf__learning_rate':     'clf__max_depth':       2
+mode=fast       best={'clf__learning_rate':     'clf__max_depth':       19
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       18
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       3
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       18
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       2
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       18
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       2
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       19
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       19
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       3
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       3
+```
 
 **生成物**
 
@@ -237,8 +268,6 @@ for ds in datasets:
 sys.exit(code)
 PY
 ```
-
-> 任意で、成功時に `artifacts/<DS>.done` を置いて二重化してもよい。
 
 #### ログからの簡易サマリ生成（README貼り付け用）
 
