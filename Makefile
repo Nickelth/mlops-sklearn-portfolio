@@ -87,3 +87,61 @@ docker-run-baked:
 docker-stop:
 	-@docker ps --filter "ancestor=$(IMAGE)" -q | xargs -r docker stop
 
+# ==== S3 Sync ====
+# 必須: 環境変数 S3_BUCKET（例: s3://my-bucket/mlops-sklearn-portfolio）
+AWS_PROFILE ?=
+AWS_REGION  ?=
+AWSCLI := aws $(if $(AWS_PROFILE),--profile $(AWS_PROFILE),) $(if $(AWS_REGION),--region $(AWS_REGION),)
+
+# 同期先
+SNAP_TS   := $(shell date -u +%Y%m%dT%H%M%SZ)
+S3_SNAPSHOT ?= $(S3_BUCKET)/snapshots/$(SNAP_TS)
+S3_LATEST   ?= $(S3_BUCKET)/latest
+
+# 便利: マニフェスト（ハッシュ）を作る
+.PHONY: manifest
+manifest:
+	@$(PY) - <<'PY'
+import hashlib, json, os, glob, time
+def sha256(path):
+    h=hashlib.sha256()
+    with open(path,'rb') as f:
+        for b in iter(lambda:f.read(1<<20), b''): h.update(b)
+    return h.hexdigest()
+items=[]
+for pat in ["models/model_*.joblib","artifacts/summary_*.json","artifacts/cv_results_*.csv","logs/*.log","artifacts/manifest.json"]:
+    for p in sorted(glob.glob(pat)):
+        if not os.path.isfile(p): continue
+        st=os.stat(p)
+        items.append({"path":p,"bytes":st.st_size,"sha256":sha256(p),"mtime":int(st.st_mtime)})
+out={"generated_at":int(time.time()),"items":items}
+os.makedirs("artifacts",exist_ok=True)
+with open("artifacts/manifest.json","w") as f: json.dump(out,f,indent=2)
+print("wrote artifacts/manifest.json with",len(items),"entries")
+PY
+
+.PHONY: s3-dryrun
+s3-dryrun:
+	@test -n "$(S3_BUCKET)" || (echo "ERROR: set S3_BUCKET=s3://…"; exit 1)
+	@echo "Would push to: $(S3_SNAPSHOT) and $(S3_LATEST)"
+
+.PHONY: s3-push
+s3-push: manifest
+	@test -n "$(S3_BUCKET)" || (echo "ERROR: set S3_BUCKET=s3://…"; exit 1)
+	@echo ">>> Pushing snapshot to $(S3_SNAPSHOT)"
+	$(AWSCLI) s3 sync models     $(S3_SNAPSHOT)/models/     --only-show-errors
+	$(AWSCLI) s3 sync artifacts  $(S3_SNAPSHOT)/artifacts/  --only-show-errors
+	$(AWSCLI) s3 sync logs       $(S3_SNAPSHOT)/logs/       --only-show-errors || true
+	@echo ">>> Updating latest at $(S3_LATEST)"
+	$(AWSCLI) s3 sync models     $(S3_LATEST)/models/       --delete --only-show-errors
+	$(AWSCLI) s3 sync artifacts  $(S3_LATEST)/artifacts/    --delete --only-show-errors
+	$(AWSCLI) s3 sync logs       $(S3_LATEST)/logs/         --delete --only-show-errors || true
+
+.PHONY: s3-pull
+s3-pull:
+	@test -n "$(S3_BUCKET)" || (echo "ERROR: set S3_BUCKET=s3://…"; exit 1)
+	@mkdir -p models artifacts logs
+	@echo ">>> Pulling from $(or $(SRC),$(S3_LATEST))"
+	$(AWSCLI) s3 sync $(or $(SRC),$(S3_LATEST))/models/    models/    --only-show-errors
+	$(AWSCLI) s3 sync $(or $(SRC),$(S3_LATEST))/artifacts/ artifacts/ --only-show-errors
+	$(AWSCLI) s3 sync $(or $(SRC),$(S3_LATEST))/logs/      logs/      --only-show-errors || true
