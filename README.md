@@ -138,6 +138,28 @@ curl -s -X POST localhost:8000/predict -H 'content-type: application/json' \
   -d '{"features":{"age":39, "education":"Bachelors", "hours-per-week":40}}'
 ```
 
+#### API スモークテストコマンド
+
+```bash
+# 依存を入れておく（dev込み）
+make init EXTRAS=[dev]
+
+# APIをバックグラウンド起動 → ヘルスチェック待ち
+make api >/dev/null 2>&1 &                                  # uvicorn 起動
+until curl -sf http://localhost:8000/health >/dev/null; do  # 起動待ち
+  sleep 0.2
+done
+
+# APIスモークテスト（/schema 200 と /predict 正常系）
+venv/bin/pytest -q tests/test_api_smoke.py
+
+# 学習スモーク（builtin×fast、[RESULT]を検証）
+venv/bin/pytest -q tests/test_train.py -k test_train_builtin_fast
+
+# 後片付け（API停止）
+pkill -f "uvicorn .*api.app" || true
+```
+
 #### 監査用コマンド
 
 ```bash
@@ -156,9 +178,11 @@ ps -ef | grep -E "[p]ython .*src/train.py .*--mode full" || echo "not running"
 # schema の列一覧取得(最小構成)
 curl -s -X POST localhost:8000/predict -H 'content-type: application/json' \
   -d '{"features":{"age":39,"education":"Bachelors","hours-per-week":40}}'
-
-
 ```
+
+- `/predict_batch` は `{"rows":[{...},{...}]}` を受けて配列で返す。
+
+- `/reload?path=…` で即切替。引数なしなら再読込。
 
 #### サスペンド制御
 
@@ -204,6 +228,22 @@ docker run --rm -p 8000:8000 mlops-api
 
 ### 7. Evidence（実行ログ・成果物）
 
+#### 生成物(2025-09-01)
+
+```
+artifacts/
+  summary_builtin_breast_cancer.json
+  summary_openml_adult.json
+  summary_openml_credit_g.json
+models/
+  model_builtin_breast_cancer.joblib   (~236 KB)
+  model_openml_adult.joblib            (~199 KB)
+  model_openml_credit_g.joblib         (~155 KB)
+logs/
+  train-YYYYmmdd_HHMMSS.log
+  latest.log -> 直近ログのシンボリックリンク
+```
+
 #### 2025-09-01〜02 実行結果（抜粋）
 
 | dataset                 | mode |    AUC |    ACC | best                                                                           | elapsed\[s] |
@@ -215,8 +255,6 @@ docker run --rm -p 8000:8000 mlops-api
 | openml\_credit\_g       | full | 0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127}` | 3             |
 | openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` | 19          |
 | openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 63}` | 19          |
-
-
 
 #### 直近結果(2525-09-06)
 ```bash
@@ -249,7 +287,7 @@ mode=full       best={'clf__learning_rate':     'clf__max_depth':       3
 mode=full       best={'clf__learning_rate':     'clf__max_depth':       19
 ```
 
-#### envinfo結果(2025-09-06)
+#### envinfo結果 (2025-09-06)
 
 ```bash
 $ make envinfo
@@ -257,20 +295,15 @@ PYTHON  : /home/user/mlops-sklearn-portfolio/venv/bin/python
 py 3.12.3 sklearn 1.7.1 pandas 2.3.2
 ```
 
-**生成物**
+#### APIスモークテスト & 学習テスト結果 (2025-09-06)
 
-```
-artifacts/
-  summary_builtin_breast_cancer.json
-  summary_openml_adult.json
-  summary_openml_credit_g.json
-models/
-  model_builtin_breast_cancer.joblib   (~236 KB)
-  model_openml_adult.joblib            (~199 KB)
-  model_openml_credit_g.joblib         (~155 KB)
-logs/
-  train-YYYYmmdd_HHMMSS.log
-  latest.log -> 直近ログのシンボリックリンク
+```bash
+$ venv/bin/pytest -q tests/test_api_smoke.py
+venv/bin/pytest -q tests/test_train.py -k test_train_builtin_fast
+.                                                                                                                                                                                                  [100%]
+1 passed in 0.07s
+.                                                                                                                                                                                                  [100%]
+1 passed, 1 deselected in 2.79s
 ```
 
 ### 運用メモ（長時間実行・ログ・終了判定）
@@ -429,6 +462,7 @@ PY
 
 ### 変更履歴
 
+* **2025-09-06**: slowマーカーをpyproject.tomlに記述
 * **2025-09-06**: API（FastAPI）実装
   - 追加: `api/app.py` に `/health`, `/predict`, `/schema`, `/reload`
   - 挙動:
@@ -439,13 +473,6 @@ PY
     - `/reload` でモデル再読込（`MODEL_PATH` 変更後の反映にも対応）
   - Makefile:
     - `make api`（ローカル起動）、必要なら `api-bg` で簡易常駐（任意）
-  - 動作確認例:
-    ```bash
-    curl -s localhost:8000/health
-    curl -s localhost:8000/schema | jq .
-    curl -s -X POST localhost:8000/predict -H 'content-type: application/json' \
-      -d '{"features":{"age":39,"education":"Bachelors","hours-per-week":40}}'
-    ```
   - 結果: `/predict` は最小3列入力でも 200/推論成功（不足列は自動補完）
 * **2025-09-02**: `adult`/`credit-g` を full モードで実行、成果物と指標を反映。ログ運用・終了判定・スリープ抑止をREADMEに追記。
 * **2025-09-01**: リポ初期化、`breast_cancer` でスモーク。

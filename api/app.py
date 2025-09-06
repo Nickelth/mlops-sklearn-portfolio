@@ -1,9 +1,14 @@
-from fastapi import FastAPI
+# api/app.py
+from fastapi import FastAPI, Query
 from pydantic import BaseModel
-import joblib, pandas as pd, os, time, threading
-from typing import List, Set
+import joblib, pandas as pd, os, time, threading, logging, json
+from datetime import datetime
+from typing import List, Set, Optional
 
 MODEL_PATH = os.getenv("MODEL_PATH", "models/model_openml_adult.joblib")
+LOG_DIR = "logs"
+LOG_FILE = os.path.join(LOG_DIR, f"api-{datetime.now().strftime('%Y%m%d')}.log")
+
 app = FastAPI(title="mlops-sklearn-api")
 
 _model = None
@@ -11,16 +16,24 @@ _lock = threading.Lock()
 _REQUIRED_COLS: List[str] = []
 _NUMERIC_COLS: Set[str] = set()
 
+# ── JSON 1行ロガー（アプリ側でアクセスログを整形してファイル出力）
+_logger = logging.getLogger("api.access")
+_logger.setLevel(logging.INFO)
+os.makedirs(LOG_DIR, exist_ok=True)
+if not _logger.handlers:
+    fh = logging.FileHandler(LOG_FILE, encoding="utf-8")
+    fh.setFormatter(logging.Formatter("%(message)s"))
+    _logger.addHandler(fh)
+
+def _json_log(**fields):
+    # ensure_ascii=False で日本語もそのまま、1行JSON
+    _logger.info(json.dumps(fields, ensure_ascii=False))
+
 def _extract_columns_from_model(model):
-    """
-    Pipeline(pre=ColumnTransformer(num=..., cat=...)) から
-    学習時に想定した列名を吸い出す。num/cat の列リストがある前提。
-    """
     try:
-        pre = model.named_steps["pre"]  # Pipeline 必須
+        pre = model.named_steps["pre"]
         transformers = getattr(pre, "transformers", None) or getattr(pre, "transformers_", None)
-        required = []
-        numeric = set()
+        required, numeric = [], set()
         for name, _trans, cols in transformers:
             if isinstance(cols, (list, tuple)):
                 required.extend(list(cols))
@@ -28,77 +41,97 @@ def _extract_columns_from_model(model):
                     numeric.update(cols)
         return list(required), numeric
     except Exception:
-        # 最悪スキーマ抽出に失敗しても API は立ち上げる
         return [], set()
 
-def load_model(path: str = MODEL_PATH):
-    global _model, _REQUIRED_COLS, _NUMERIC_COLS
+def load_model(path: str):
+    global _model, _REQUIRED_COLS, _NUMERIC_COLS, MODEL_PATH
     with _lock:
-        m = joblib.load(path)
-        _model = m
-        _REQUIRED_COLS, _NUMERIC_COLS = _extract_columns_from_model(m)
+        _model = joblib.load(path)
+        MODEL_PATH = path  # 実際に読んだものを現在値に
+        _REQUIRED_COLS, _NUMERIC_COLS = _extract_columns_from_model(_model)
     return _model
 
-def _normalize_row(features: dict) -> pd.DataFrame:
-    """
-    学習スキーマに合わせて不足列を補完し、数値列は numeric に強制変換。
-    余計な列は黙って捨てる。列順も学習時に合わせる。
-    """
+def _normalize_batch(rows: List[dict]) -> pd.DataFrame:
+    # rows: [{col: val, ...}, ...]
     if not _REQUIRED_COLS:
-        # 最悪時は来たキーをそのまま使う（本質的には推奨しない）
-        X = pd.DataFrame([features])
-        return X
-
-    row = {col: features.get(col, None) for col in _REQUIRED_COLS}
-    X = pd.DataFrame([row], columns=_REQUIRED_COLS)
+        return pd.DataFrame(rows)
+    df = pd.DataFrame(rows)
+    # 余計な列は捨て、足りない列は None を補完
+    for col in _REQUIRED_COLS:
+        if col not in df.columns:
+            df[col] = None
+    df = df[_REQUIRED_COLS]
+    # 数値列は to_numeric で NaN 許容（Imputer が面倒を見る）
     for col in _NUMERIC_COLS:
-        if col in X.columns:
-            X[col] = pd.to_numeric(X[col], errors="coerce")
-    return X
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+    return df
 
 class Row(BaseModel):
-    features: dict  # 学習時の列名で渡す（不足は自動補完）
+    features: dict
+
+class Rows(BaseModel):
+    rows: List[dict]
 
 @app.on_event("startup")
 def _startup():
-    load_model()
+    load_model(MODEL_PATH)
+    _json_log(ts=time.time(), event="startup", model=os.path.basename(MODEL_PATH))
+
+@app.middleware("http")
+async def access_log(request, call_next):
+    t0 = time.time()
+    try:
+        resp = await call_next(request)
+        status = resp.status_code
+    except Exception as e:
+        status = 500
+        raise
+    finally:
+        t1 = time.time()
+        _json_log(
+            ts=t1,
+            method=request.method,
+            path=request.url.path,
+            query=str(request.url.query),
+            status=status,
+            latency_ms=int((t1 - t0) * 1000),
+            client=getattr(request.client, "host", None),
+            ua=request.headers.get("user-agent"),
+            model=os.path.basename(MODEL_PATH),
+        )
+    return resp
 
 @app.get("/health")
 def health():
-    return {
-        "status": "ok",
-        "model": os.path.basename(MODEL_PATH),
-        "ts": time.time(),
-        "cols": len(_REQUIRED_COLS) or None,
-    }
+    return {"status": "ok", "model": os.path.basename(MODEL_PATH), "ts": time.time(), "cols": len(_REQUIRED_COLS) or None}
 
 @app.get("/schema")
 def schema():
-    return {
-        "required_columns": _REQUIRED_COLS,
-        "numeric_columns": sorted(_NUMERIC_COLS),
-    }
+    return {"required_columns": _REQUIRED_COLS, "numeric_columns": sorted(_NUMERIC_COLS)}
 
 @app.post("/predict")
 def predict(item: Row):
     if _model is None:
-        load_model()
-    X = _normalize_row(item.features)
+        load_model(MODEL_PATH)
+    X = _normalize_batch([item.features])
     proba = getattr(_model, "predict_proba", None)
     if proba:
         return {"pred_proba": float(proba(X)[:, 1][0])}
     return {"pred": _model.predict(X)[0]}
 
-@app.post("/reload")
-def reload_model():
-    load_model()
-    return {"status": "reloaded", "model": os.path.basename(MODEL_PATH)}
-
-class Rows(BaseModel):
-    rows: list[dict]
 @app.post("/predict_batch")
 def predict_batch(items: Rows):
-    X = pd.DataFrame(items.rows)
-    X = pd.concat([_normalize_row(r) for r in items.rows], ignore_index=True)
-    proba = _model.predict_proba(X)[:,1].tolist()
-    return {"pred_proba": proba}
+    if _model is None:
+        load_model(MODEL_PATH)
+    X = _normalize_batch(items.rows)
+    proba = getattr(_model, "predict_proba", None)
+    if proba:
+        return {"pred_proba": [float(x) for x in proba(X)[:, 1].tolist()]}
+    return {"pred": _model.predict(X).tolist()}
+
+@app.post("/reload")
+def reload_model(path: Optional[str] = Query(None, description="モデルファイルへのパス")):
+    # ?path=... があればそれを優先、無ければ現行 MODEL_PATH を再読込
+    load_model(path or MODEL_PATH)
+    return {"status": "reloaded", "model": os.path.basename(MODEL_PATH)}
