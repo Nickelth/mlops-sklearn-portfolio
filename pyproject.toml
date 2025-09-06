@@ -1,27 +1,11 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-requires-python = ">=3.10"
-dependencies = [
-  "pandas>=2.2,<3",
-  "scikit-learn>=1.4,<1.6",
-  "joblib>=1.4",
-  "threadpoolctl>=3.5",
-]
-[project.optional-dependencies]
-api = ["fastapi","uvicorn"]
-dev = ["black","ruff","mypy","pytest","ipykernel"]
+name = "mlops-sklearn-portfolio"
+version = "0.1.0"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
-py-modules = ["datasets","features","smoke","train","utils"]
-
-# ここが本題：ベース依存（今すぐ必要なやつだけ）
-dependencies = [
-  "pandas",
-  "scikit-learn",
-  "joblib",
-  "threadpoolctl",
-]
+packages = { find = { where = ["src"], include = ["*"], exclude = [] } }
