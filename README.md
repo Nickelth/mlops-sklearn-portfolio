@@ -531,6 +531,8 @@ check:
 
 ### 変更履歴
 
+* **2025-09-06**: 学習サマリ artifacts/summary_*.json には git_commit / python / sklearn / pandas を記録
+* **2025-09-06**: artifacts/manifest.json に成果物の SHA256 とサイズを保存（再現検証用）
 * **2025-09-06**: slowマーカーをpyproject.tomlに記述
 * **2025-09-06**: API（FastAPI）実装
   - 追加: `api/app.py` に `/health`, `/predict`, `/schema`, `/reload`

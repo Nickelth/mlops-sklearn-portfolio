@@ -26,7 +26,8 @@ MODE ?= fast
 
 train: | $(STAMP)
 	mkdir -p logs models cache artifacts
-	env $(BLAS) nice -n 10 $(PY) src/train.py --dataset $(DS) --mode $(MODE) 2>&1 | tee logs/train-$(TS).log
+	env $(BLAS) nice -n 10 $(PY) src/train.py --dataset $(DS) --mode $(MODE) \
+		> logs/train-$(TS).log 2>&1
 
 train-fast:
 	$(MAKE) train MODE=fast

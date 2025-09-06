@@ -29,7 +29,6 @@ from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import roc_auc_score, accuracy_score
 
 from datasets import load_dataset  # パッケージ src/datasets/loader.py
-# 先頭のimportに追加
 import platform, subprocess, sklearn
 
 def _git_commit() -> str | None:
