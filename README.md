@@ -119,19 +119,24 @@ done
 echo "=== END $(date -Is) ==="
 ' >/dev/null 2>&1 &
 
+# 依存なし最小構成
+make init EXTRAS=
+make envinfo
 
-# 学習
-make train-full
+# 依存と開発ツール込み
+make init EXTRAS=[dev]
+make envinfo
 
-# API
+# 学習とAPIの生存確認
+make train-full DS=adult
+make check
 make api &
+sleep 2 &
 curl -s localhost:8000/health
+
 curl -s -X POST localhost:8000/predict -H 'content-type: application/json' \
   -d '{"features":{"age":39, "education":"Bachelors", "hours-per-week":40}}'
-
-
 ```
-
 
 #### 監査用コマンド
 
@@ -206,20 +211,23 @@ docker run --rm -p 8000:8000 mlops-api
 | builtin\_breast\_cancer | fast | 0.9924 | 0.9649 | `{'clf__learning_rate': 0.2, 'clf__max_depth': 8, 'clf__max_leaf_nodes': 63}`  |           2 |
 | openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}`  |          18 |
 | openml\_credit\_g       | full | 0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` |           2 |
-| openml\_adult           | full |  0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127}`  | 19            |
-| openml\_credit\_g       | full |  0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127}` | 3             |
-| openml\_adult           | full |  0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` | 19          |
+| openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127}`  | 19            |
+| openml\_credit\_g       | full | 0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127}` | 3             |
+| openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` | 19          |
+| openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 63}` | 19          |
+
 
 
 #### 直近結果(2525-09-06)
 ```bash
-grep -h "^\[RESULT\]" logs/train-*.log | tail -n 6
+grep -h "^\[RESULT\]" logs/train-*.log | tail -n 7
 [RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=2
 [RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=19
 [RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=19
 [RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=3
 [RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=3
 [RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=19
+[RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 63} elapsed_sec=19
 ```
 
 ```bash
@@ -239,6 +247,14 @@ mode=full       best={'clf__learning_rate':     'clf__max_depth':       19
 mode=full       best={'clf__learning_rate':     'clf__max_depth':       3
 mode=full       best={'clf__learning_rate':     'clf__max_depth':       3
 mode=full       best={'clf__learning_rate':     'clf__max_depth':       19
+```
+
+#### envinfo結果(2025-09-06)
+
+```bash
+$ make envinfo
+PYTHON  : /home/user/mlops-sklearn-portfolio/venv/bin/python
+py 3.12.3 sklearn 1.7.1 pandas 2.3.2
 ```
 
 **生成物**
