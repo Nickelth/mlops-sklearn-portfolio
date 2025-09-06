@@ -29,7 +29,15 @@ from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import roc_auc_score, accuracy_score
 
 from datasets import load_dataset  # パッケージ src/datasets/loader.py
+# 先頭のimportに追加
+import platform, subprocess, sklearn
 
+def _git_commit() -> str | None:
+    try:
+        out = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.DEVNULL, timeout=2)
+        return out.decode().strip()
+    except Exception:
+        return None
 
 def build_preprocessor(df: pd.DataFrame) -> ColumnTransformer:
     num_cols = list(df.select_dtypes(include=["number"]).columns)
@@ -132,6 +140,13 @@ def main() -> None:
 
     pd.DataFrame(search.cv_results_).to_csv(f"artifacts/cv_results_{dsname}.csv", index=False)
 
+    meta = {
+        "git_commit": _git_commit(),
+        "python": platform.python_version(),
+        "sklearn": sklearn.__version__,
+        "pandas": pd.__version__,
+    }
+
     with open(f"artifacts/summary_{dsname}.json", "w") as f:
         json.dump({
             "dataset": dsname,
@@ -143,6 +158,7 @@ def main() -> None:
             "finished_at": int(time.time()),
             "min_resources": min_res,
             "cv_splits": n_splits,
+            **meta,
         }, f, indent=2)
 
     print(
