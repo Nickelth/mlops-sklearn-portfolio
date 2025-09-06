@@ -88,6 +88,7 @@ make train-full DS=credit-g
 # logs/latest.log にシンボリックリンク
 # Pythonは非バッファ出力、BLASは1スレに固定
 # 各DSの開始/終了/RCを行ごとに記録
+# 実行日時: 2025-09-02 22:44〜
 
 nohup bash -lc '
 set -Eeuo pipefail
@@ -118,6 +119,17 @@ done
 echo "=== END $(date -Is) ==="
 ' >/dev/null 2>&1 &
 
+
+# 学習
+make train-full
+
+# API
+make api &
+curl -s localhost:8000/health
+curl -s -X POST localhost:8000/predict -H 'content-type: application/json' \
+  -d '{"features":{"age":39, "education":"Bachelors", "hours-per-week":40}}'
+
+
 ```
 
 
@@ -127,6 +139,20 @@ echo "=== END $(date -Is) ==="
 tail -f logs/latest.log
 # 区切りは "DS=<name> start/end" をgrepすれば一目
 grep -nE -- "--- DS=" logs/latest.log
+
+grep -h "^\[RESULT\]" logs/train-*.log | tail -n 5
+
+grep -h "^\[RESULT\]" logs/train-*.log |
+  awk '{ds=$3; auc=$6; acc=$8; for(i=1;i<=NF;i++) if($i ~ /elapsed_sec=/){split($i,a,"="); sec=a[2]} print ds"\t"auc"\t"acc"\t"sec }'
+
+# make train-full が稼働中かどうか確認
+ps -ef | grep -E "[p]ython .*src/train.py .*--mode full" || echo "not running"
+
+# schema の列一覧取得(最小構成)
+curl -s -X POST localhost:8000/predict -H 'content-type: application/json' \
+  -d '{"features":{"age":39,"education":"Bachelors","hours-per-week":40}}'
+
+
 ```
 
 #### サスペンド制御
@@ -180,18 +206,20 @@ docker run --rm -p 8000:8000 mlops-api
 | builtin\_breast\_cancer | fast | 0.9924 | 0.9649 | `{'clf__learning_rate': 0.2, 'clf__max_depth': 8, 'clf__max_leaf_nodes': 63}`  |           2 |
 | openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}`  |          18 |
 | openml\_credit\_g       | full | 0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` |           2 |
-| openml\_adult     | full |  0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127}`  | 19            |
-| openml\_credit\_g | full |  0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127}` | 3             |
+| openml\_adult           | full |  0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127}`  | 19            |
+| openml\_credit\_g       | full |  0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127}` | 3             |
+| openml\_adult           | full |  0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` | 19          |
 
 
-#### 直近結果(2525-09-03)
+#### 直近結果(2525-09-06)
 ```bash
-grep -h "^\[RESULT\]" logs/train-*.log | tail -n 5
+grep -h "^\[RESULT\]" logs/train-*.log | tail -n 6
 [RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=2
 [RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=19
 [RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=19
 [RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=3
 [RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=3
+[RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=19
 ```
 
 ```bash
@@ -210,6 +238,7 @@ mode=full       best={'clf__learning_rate':     'clf__max_depth':       19
 mode=full       best={'clf__learning_rate':     'clf__max_depth':       19
 mode=full       best={'clf__learning_rate':     'clf__max_depth':       3
 mode=full       best={'clf__learning_rate':     'clf__max_depth':       3
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       19
 ```
 
 **生成物**
@@ -227,10 +256,6 @@ logs/
   train-YYYYmmdd_HHMMSS.log
   latest.log -> 直近ログのシンボリックリンク
 ```
-
-> 備考: 2025-09-01 21:44台のログに `Traceback` を確認。OpenML取得やI/Oエラーの可能性があるため、再試行ロジック（下記）を導入予定。
-
----
 
 ### 運用メモ（長時間実行・ログ・終了判定）
 
@@ -388,6 +413,24 @@ PY
 
 ### 変更履歴
 
+* **2025-09-06**: API（FastAPI）実装
+  - 追加: `api/app.py` に `/health`, `/predict`, `/schema`, `/reload`
+  - 挙動:
+    - 学習済みパイプライン（`models/model_openml_adult.joblib`）を起動時ロード
+    - `/schema` で学習時の必須列と数値列を公開
+    - `/predict` は不足列を `None` 補完、数値列は自動で `to_numeric(errors="coerce")`
+      - 前処理の `SimpleImputer` と `OneHotEncoder(handle_unknown="ignore")` により欠損・未知カテゴリを許容
+    - `/reload` でモデル再読込（`MODEL_PATH` 変更後の反映にも対応）
+  - Makefile:
+    - `make api`（ローカル起動）、必要なら `api-bg` で簡易常駐（任意）
+  - 動作確認例:
+    ```bash
+    curl -s localhost:8000/health
+    curl -s localhost:8000/schema | jq .
+    curl -s -X POST localhost:8000/predict -H 'content-type: application/json' \
+      -d '{"features":{"age":39,"education":"Bachelors","hours-per-week":40}}'
+    ```
+  - 結果: `/predict` は最小3列入力でも 200/推論成功（不足列は自動補完）
 * **2025-09-02**: `adult`/`credit-g` を full モードで実行、成果物と指標を反映。ログ運用・終了判定・スリープ抑止をREADMEに追記。
 * **2025-09-01**: リポ初期化、`breast_cancer` でスモーク。
 
