@@ -205,6 +205,43 @@ sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.
 
 ### 6. デプロイ手順とロールバック手順（進行中）
 
+#### Docker で起動
+
+#### ビルド
+
+```bash
+make docker-build IMAGE=mlops-sklearn-portfolio:local
+```
+
+#### 実行
+
+```bash
+# 事前に学習済みモデルを ./models/ に置く
+make docker-run IMAGE=mlops-sklearn-portfolio:local PORT=8000
+# health
+curl -s localhost:8000/health | jq .
+# schema
+curl -s localhost:8000/schema | jq .
+# predict
+curl -s -X POST localhost:8000/predict -H 'content-type: application/json' \
+  -d '{"features":{"age":39,"education":"Bachelors","hours-per-week":40}}' | jq .
+```
+
+- アプリは JSON1行ログを `/app/logs/api-YYYYMMDD.log` に出力。
+- `make docker-run` なら `./logs/` に同期される。
+
+#### モデル切り替え
+
+```bash
+curl -s -X POST "http://localhost:8000/reload?path=/app/models/model_openml_adult.joblib"
+```
+
+#### Dockerの停止
+
+```bash
+make docker-stop || true
+```
+
 #### ローカル API（FastAPI）
 
 ```bash
@@ -318,34 +355,15 @@ bash -lc 'nice -n 10 python -u src/train.py --mode full 2>&1 | tee logs/train-$(
 
 #### 終了判定（`make check` 例）
 
-```make
-# 0=全DS完了, 1=失敗あり, 2=進行中/未開始
+```makefile
 check:
-	@python - <<'PY'
-import re, sys, pathlib
-log = pathlib.Path("logs/latest.log")
-if not log.exists(): print("logs/latest.log not found"); sys.exit(2)
-txt = log.read_text(errors="ignore")
-starts = list(re.finditer(r"^=== START .+? ===$", txt, flags=re.M))
-region = txt[starts[-1].start():] if starts else txt
-datasets = ["adult", "credit-g"]
-code = 0
-for ds in datasets:
-    s = re.search(fr"--- DS={ds} start ", region)
-    ok = re.search(fr"--- DS={ds} OK ", region)
-    fail = re.search(fr"--- DS={ds} FAIL ", region)
-    if ok: st="OK"
-    elif fail: st="FAIL"; code=1
-    elif s: st="RUNNING"; code=max(code,2)
-    else: st="PENDING"; code=max(code,2)
-    print(f"{ds}: {st}")
-sys.exit(code)
-PY
+	@grep -E "^\[RESULT\]|^=== TRAIN DONE ===|^Traceback|^ERROR" -n logs/train-*.log | tail -n 30 || true
+	@ls -lh models/model_*.joblib artifacts/summary_*.json 2>/dev/null || true
 ```
 
-#### ログからの簡易サマリ生成（README貼り付け用）
+#### ログからの簡易サマリ生成
 
-```make
+```makefile
 report:
 	@python - <<'PY'
 import re,glob
