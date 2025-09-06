@@ -88,7 +88,7 @@ make train-full DS=credit-g
 # logs/latest.log にシンボリックリンク
 # Pythonは非バッファ出力、BLASは1スレに固定
 # 各DSの開始/終了/RCを行ごとに記録
-# 実行日時: 2025-09-02 22:44〜
+# 実行日時: 2025-09-02 22:44
 
 nohup bash -lc '
 set -Eeuo pipefail
@@ -118,7 +118,9 @@ done
 
 echo "=== END $(date -Is) ==="
 ' >/dev/null 2>&1 &
+```
 
+```bash
 # 依存なし最小構成
 make init EXTRAS=
 make envinfo
@@ -136,6 +138,42 @@ curl -s localhost:8000/health
 
 curl -s -X POST localhost:8000/predict -H 'content-type: application/json' \
   -d '{"features":{"age":39, "education":"Bachelors", "hours-per-week":40}}'
+```
+
+```bash
+#  監視と睡眠抑止つきでバックグラウンド起動
+#  実行日時: 2025-09-06 18:50
+#  adult→credit-g を full で回す。
+systemd-inhibit --what=sleep --why="ml-train" \
+nohup bash -lc '
+set -Eeuo pipefail
+mkdir -p logs
+LOG="logs/train-$(date +%Y%m%d_%H%M%S).log"
+ln -sfn "$LOG" logs/latest-train.log
+exec > >(stdbuf -oL -eL tee -a "$LOG") 2>&1
+
+echo "=== START $(date -Is) pid=$$ ==="
+# 排他: すでに回ってたら即終了
+exec 9>/tmp/ml-train.lock
+if ! flock -n 9; then echo "[SKIP] another training is running"; exit 0; fi
+
+# 実行
+echo "--- DS=adult start $(date -Is) ---"
+if timeout --signal=INT --kill-after=30s 12h make train-full DS=adult; then
+  echo "--- DS=adult OK end=$(date -Is) ---"
+else
+  echo "--- DS=adult FAIL rc=$? end=$(date -Is) ---"
+fi
+
+echo "--- DS=credit-g start $(date -Is) ---"
+if timeout --signal=INT --kill-after=30s 12h make train-full DS=credit-g; then
+  echo "--- DS=credit-g OK end=$(date -Is) ---"
+else
+  echo "--- DS=credit-g FAIL rc=$? end=$(date -Is) ---"
+fi
+
+echo "=== END $(date -Is) ==="
+' >/dev/null 2>&1 &
 ```
 
 #### API スモークテストコマンド
@@ -205,9 +243,7 @@ sudo systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.
 
 ### 6. デプロイ手順とロールバック手順（進行中）
 
-#### Docker で起動
-
-#### ビルド
+#### Docker起動 & ビルド
 
 ```bash
 make docker-build IMAGE=mlops-sklearn-portfolio:local
@@ -251,7 +287,31 @@ docker build -t mlops-api .
 docker run --rm -p 8000:8000 mlops-api
 ```
 
-### ECS デプロイ（予定/設計方針）
+#### CI
+
+- **トリガー**: Push／Pull Request／手動実行（workflow_dispatch）
+- **環境**: Ubuntu 最新、Python 3.12、`libgomp1` 追加（scikit-learn用）
+- **依存インストール**: `pip install -e .[dev]`（pyproject準拠、pipキャッシュ有効）
+- **スレッド制御**: `OMP_NUM_THREADS=1` ほか BLAS 内スレ抑制で安定化
+- **API スモーク**:
+  - `uvicorn api.app:app` をバックグラウンド起動
+  - `/health` に HTTP 200 応答が返るまで待機
+  - `tests/test_api_smoke.py` 実行（`/schema` 200、`/predict` 正常系）
+- **学習スモーク**:
+  - `tests/test_train.py::test_train_builtin_fast` 実行
+  - `--dataset builtin --mode fast` が完走し、`[RESULT]` 行と成果物生成を検証
+  - ※`slow` マークのテスト（OpenML利用など）は既定で無効。必要時は `RUN_SLOW=1` で実行
+- **Docker ビルド**:
+  - Buildx で `docker build` のみ実施（**push しない**）
+  - タグ: `mlops-sklearn-portfolio:test-ci`
+- **同時実行制御**: 同一ブランチは古いジョブをキャンセル（`concurrency`）
+- **タイムアウト**: test ジョブ 20分、docker-build ジョブ 20分
+
+#### バッジ
+
+![CI](https://github.com/Nickelth/mlops-sklearn-portfolio/actions/workflows/ci.yml/badge.svg)
+
+#### ECS デプロイ（予定/設計方針）
 
 * ECR: `mlops/api`
 * ECS(Fargate) 1サービス/最小タスク数1、ALB経由で `/health`
@@ -292,10 +352,14 @@ logs/
 | openml\_credit\_g       | full | 0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127}` | 3             |
 | openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` | 19          |
 | openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 63}` | 19          |
+| openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` | 19          |
+| openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` | 19          |
+| openml\_credit\_g       | full | 0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` | 3             |
+| openml\_credit\_g       | full | 0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` | 3             |
 
 #### 直近結果(2525-09-06)
 ```bash
-grep -h "^\[RESULT\]" logs/train-*.log | tail -n 7
+grep -h "^\[RESULT\]" logs/train-*.log | tail -n 11
 [RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=2
 [RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=19
 [RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=19
@@ -303,6 +367,10 @@ grep -h "^\[RESULT\]" logs/train-*.log | tail -n 7
 [RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=3
 [RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=19
 [RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 63} elapsed_sec=19
+[RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=19
+[RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=19
+[RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=3
+[RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=3
 ```
 
 ```bash
@@ -360,23 +428,6 @@ check:
 	@grep -E "^\[RESULT\]|^=== TRAIN DONE ===|^Traceback|^ERROR" -n logs/train-*.log | tail -n 30 || true
 	@ls -lh models/model_*.joblib artifacts/summary_*.json 2>/dev/null || true
 ```
-
-#### ログからの簡易サマリ生成
-
-```makefile
-report:
-	@python - <<'PY'
-import re,glob
-print("|dataset|mode|AUC|ACC|best|elapsed[s]|")
-print("|-|-|-:|-:|-|-:|")
-for p in sorted(glob.glob("logs/train-*.log")):
-  for line in open(p,errors="ignore"):
-    m=re.search(r"\[RESULT\] ds=(\S+) mode=(\S+) AUC=([\d.]+) ACC=([\d.]+) best=(\{.+?\}) elapsed_sec=(\d+)", line)
-    if m: print("|"+"|".join(m.groups())+"|")
-PY
-```
-
----
 
 ### 既知の課題 / 次のアクション
 
