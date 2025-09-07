@@ -145,3 +145,21 @@ s3-pull:
 	$(AWSCLI) s3 sync $(or $(SRC),$(S3_LATEST))/models/    models/    --only-show-errors
 	$(AWSCLI) s3 sync $(or $(SRC),$(S3_LATEST))/artifacts/ artifacts/ --only-show-errors
 	$(AWSCLI) s3 sync $(or $(SRC),$(S3_LATEST))/logs/      logs/      --only-show-errors || true
+
+# ==== ECR Push ====
+AWS_REGION ?= us-west-2
+AWS_ACCOUNT_ID ?= $(shell aws sts get-caller-identity --query Account --output text 2>/dev/null)
+REPO_NAME ?= mlops-sklearn-portfolio
+ECR_URI   ?= $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(REPO_NAME)
+TAG ?= v$(shell date +%Y%m%d)-1
+
+.PHONY: ecr-login docker-push
+ecr-login:
+	aws ecr get-login-password --region $(AWS_REGION) \
+	| docker login --username AWS --password-stdin $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
+
+docker-push: docker-build ecr-login
+	docker tag $(IMAGE) $(ECR_URI):$(TAG)
+	docker tag $(IMAGE) $(ECR_URI):latest
+	docker push $(ECR_URI):$(TAG)
+	docker push $(ECR_URI):latest
