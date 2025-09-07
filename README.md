@@ -3,6 +3,8 @@
 scikit-learn + Pipeline で表形式MLを**学習→成果物→推論API→コンテナ**まで最短導線で通すポートフォリオ。
 
 [![CI](https://github.com/Nickelth/mlops-sklearn-portfolio/actions/workflows/ci.yml/badge.svg)](../../actions)
+[![CI](https://github.com/Nickelth/mlops-sklearn-portfolio/actions/workflows/release-ecr.yml/badge.svg)](../../actions)
+[![CI](https://github.com/Nickelth/mlops-sklearn-portfolio/actions/workflows/push-s3.yml/badge.svg)](../../actions)
 
 ## ルール
 
@@ -36,3 +38,7 @@ curl -s localhost:8000/health
 ```
 api/  src/  models/  artifacts/  logs/  tests/  docs/
 ```
+
+- 「workers=1/2 の差」ひとこと比較（RPSの伸びと P95 の変化だけ）
+- /reload の切替所要時間（ms）
+- S3 latest/ とスナップショットの両立運用方針（既に書いてるならリンクだけ）
