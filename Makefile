@@ -98,27 +98,10 @@ SNAP_TS   := $(shell date -u +%Y%m%dT%H%M%SZ)
 S3_SNAPSHOT ?= $(S3_BUCKET)/snapshots/$(SNAP_TS)
 S3_LATEST   ?= $(S3_BUCKET)/latest
 
-# 便利: マニフェスト（ハッシュ）を作る
+# マニフェスト（ハッシュ）を作る
 .PHONY: manifest
 manifest:
-	@$(PY) - <<'PY'
-import hashlib, json, os, glob, time
-def sha256(path):
-    h=hashlib.sha256()
-    with open(path,'rb') as f:
-        for b in iter(lambda:f.read(1<<20), b''): h.update(b)
-    return h.hexdigest()
-items=[]
-for pat in ["models/model_*.joblib","artifacts/summary_*.json","artifacts/cv_results_*.csv","logs/*.log","artifacts/manifest.json"]:
-    for p in sorted(glob.glob(pat)):
-        if not os.path.isfile(p): continue
-        st=os.stat(p)
-        items.append({"path":p,"bytes":st.st_size,"sha256":sha256(p),"mtime":int(st.st_mtime)})
-out={"generated_at":int(time.time()),"items":items}
-os.makedirs("artifacts",exist_ok=True)
-with open("artifacts/manifest.json","w") as f: json.dump(out,f,indent=2)
-print("wrote artifacts/manifest.json with",len(items),"entries")
-PY
+	@$(PY) scripts/generate_manifest.py
 
 .PHONY: s3-dryrun
 s3-dryrun:
