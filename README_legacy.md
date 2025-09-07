@@ -310,6 +310,8 @@ docker run --rm -p 8000:8000 mlops-api
 #### バッジ
 
 ![CI](https://github.com/Nickelth/mlops-sklearn-portfolio/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/Nickelth/mlops-sklearn-portfolio/actions/workflows/release-ecr.yml/badge.svg)
+![CI](https://github.com/Nickelth/mlops-sklearn-portfolio/actions/workflows/push-s3.yml/badge.svg)
 
 #### ECS デプロイ（予定/設計方針）
 
@@ -356,25 +358,17 @@ logs/
   latest.log -> 直近ログのシンボリックリンク
 ```
 
-#### 2025-09-01〜02 実行結果（抜粋）
-
-| dataset                 | mode |    AUC |    ACC | best                                                                           | elapsed\[s] |
-| ----------------------- | ---- | -----: | -----: | ------------------------------------------------------------------------------ | ----------: |
-| builtin\_breast\_cancer | fast | 0.9924 | 0.9649 | `{'clf__learning_rate': 0.2, 'clf__max_depth': 8, 'clf__max_leaf_nodes': 63}`  |           2 |
-| openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}`  |          18 |
-| openml\_credit\_g       | full | 0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` |           2 |
-| openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127}`  | 19            |
-| openml\_credit\_g       | full | 0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127}` | 3             |
-| openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` | 19          |
-| openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 63}` | 19          |
-| openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` | 19          |
-| openml\_adult           | full | 0.9253 | 0.8718 | `{'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` | 19          |
-| openml\_credit\_g       | full | 0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` | 3             |
-| openml\_credit\_g       | full | 0.7570 | 0.7250 | `{'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31}` | 3             |
-
-#### 直近結果(2525-09-06)
+#### 実行結果(2025-09-01~2025-09-07)
 ```bash
-grep -h "^\[RESULT\]" logs/train-*.log | tail -n 11
+grep -h "^\[RESULT\]" logs/train-*.log | tail -n 30
+[RESULT] ds=builtin_breast_cancer mode=fast AUC=0.9924 ACC=0.9649 best={'clf__learning_rate': 0.2, 'clf__max_depth': 8, 'clf__max_leaf_nodes': 63} elapsed_sec=2
+[RESULT] ds=builtin_breast_cancer mode=fast AUC=0.9924 ACC=0.9649 best={'clf__learning_rate': 0.2, 'clf__max_depth': 8, 'clf__max_leaf_nodes': 63} elapsed_sec=2
+[RESULT] ds=openml_adult mode=fast AUC=0.9282 ACC=0.8726 best={'clf__learning_rate': 0.2, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 63} elapsed_sec=19
+[RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=18
+[RESULT] ds=openml_credit_g mode=full AUC=0.7690 ACC=0.7550 best={'clf__learning_rate': 0.05, 'clf__max_depth': None, 'clf__max_leaf_nodes': 63} elapsed_sec=3
+[RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=18
+[RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=2
+[RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=18
 [RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=2
 [RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=19
 [RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 127} elapsed_sec=19
@@ -386,6 +380,12 @@ grep -h "^\[RESULT\]" logs/train-*.log | tail -n 11
 [RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=19
 [RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=3
 [RESULT] ds=openml_credit_g mode=full AUC=0.7570 ACC=0.7250 best={'clf__learning_rate': 0.05, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=3
+[RESULT] ds=openml_adult mode=full AUC=0.9253 ACC=0.8718 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=19
+[RESULT] ds=openml_adult mode=full AUC=0.9257 ACC=0.8726 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=18
+[RESULT] ds=openml_adult mode=full AUC=0.9255 ACC=0.8707 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=18
+[RESULT] ds=openml_adult mode=full AUC=0.9259 ACC=0.8729 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=18
+[RESULT] ds=openml_adult mode=full AUC=0.9262 ACC=0.8719 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=22
+[RESULT] ds=openml_adult mode=full AUC=0.9256 ACC=0.8706 best={'clf__learning_rate': 0.1, 'clf__max_depth': 4, 'clf__max_leaf_nodes': 31} elapsed_sec=18
 ```
 
 ```bash
@@ -405,6 +405,17 @@ mode=full       best={'clf__learning_rate':     'clf__max_depth':       19
 mode=full       best={'clf__learning_rate':     'clf__max_depth':       3
 mode=full       best={'clf__learning_rate':     'clf__max_depth':       3
 mode=full       best={'clf__learning_rate':     'clf__max_depth':       19
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       19
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       19
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       19
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       3
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       3
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       19
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       18
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       18
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       18
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       22
+mode=full       best={'clf__learning_rate':     'clf__max_depth':       18
 ```
 
 #### envinfo結果 (2025-09-06)
