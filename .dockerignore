@@ -1,0 +1,10 @@
+# .dockerignore
+.git
+venv
+__pycache__/
+*.pyc
+.cache/
+logs/
+artifacts/
+# ↓イメージにモデルを焼かない前提。焼くならコメントアウト
+models/
