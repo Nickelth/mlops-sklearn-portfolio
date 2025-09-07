@@ -2,33 +2,51 @@
 
 ## 2025-09-07
 
-### Added
-- **GitHub Actions: `release-ecr.yml`**  
-  タグ push（`v*`）および手動実行で Docker イメージを Build→ECR へ Push。
-- **GitHub Actions: `push-s3.yml`**  
-  `models/` と `artifacts/` を S3 に同期。`manifest.json` を自動生成し、スナップショットと `latest/` を更新。
-- **Makefile ターゲット**  
-  `deps`（依存自動インストール）、`train-file`（静音学習）、`manifest`、`s3-push`、`s3-pull`、`ecr-login`、`docker-push` を追加。
-- **スクリプト**: `scripts/generate_manifest.py`（SHA256・サイズを収集して `artifacts/manifest.json` を生成）。
+### Infra / ECR
+- GitHub Actions `release-ecr.yml` を整備（OIDC で AssumeRole、手動/タグ `v*` トリガ）。
+- 環境 `ecr-prod` を作成し、`AWS_REGION=us-west-2`、`AWS_ROLE_TO_ASSUME=<IAM Role ARN>`、`ECR_REPO=mlops-sklearn-portfolio` を設定。
+- ワークフローを実行し、ECR へ以下をプッシュ:
+  - `<account>.dkr.ecr.us-west-2.amazonaws.com/mlops-sklearn-portfolio:v20250907-1`
+  - `<account>.dkr.ecr.us-west-2.amazonaws.com/mlops-sklearn-portfolio:latest`
+- ECR のスキャンは完了。重大/高は 0（中: 1）で検出なし。
 
-### Changed
-- **学習系**: 既存の `train` を整理し、`deps` に依存させた上でログを `tee` で標準出力にも流す方式に変更。  
-  `train-fast` / `train-full` / `train-both` は従来どおり `train` を呼び出し。
-- **CI 実行の堅牢化**: 依存インストール（`pip install -e .[dev]`）と失敗時の学習ログ出力（tail）を追加。
+### Artifacts / S3（“モデル棚”）
+- `push-s3.yml` を追加（OIDC 認証で S3 に models/artifacts/logs を同期）。
+- 初回の NoSuchBucket を解消し、バケット `s3://nickelth-mlops-artifacts/mlops-sklearn-portfolio` を使用。
+- スナップショット: `snapshots/<UTC>/`、ミラー: `latest/` を更新。
+- `artifacts/manifest.json` を生成し、SHA256/サイズ/生成時刻を保存。
 
-### Infrastructure
-- **ECR**: `us-west-2` のリポジトリ（`mlops-sklearn-portfolio`）に Push 成功。`latest` とリリースタグ（例 `v20250907-1`）で登録。イメージスキャン完了。
-- **GitHub Environment**: `ecr-prod` を作成し、OIDC でのロール引受を構成。  
-  リポジトリ Variables に `AWS_REGION` / `AWS_ROLE_TO_ASSUME` / `S3_BUCKET` を設定。
-- **S3 “モデル棚”**: CI と Make からスナップショット（UTC 時刻）と `latest/` への同期を運用開始。
+### Build & Ops（Makefile/CI）
+- `train` ターゲットの競合を解消。CI では `tee` で標準出力にログを流しつつファイル保存。
+- 追加/整備:
+  - `manifest`, `s3-push`, `s3-pull`, `ecr-login`, `docker-push`
+  - venv スタンプ `venv/.ok` と `deps` ターゲット
+  - BLAS 内スレ固定と低優先度実行を既定化
+- CI（`release-ecr.yml` / `push-s3.yml`）は OIDC 経由で実行可能な状態に。
 
-### Fixed
-- **OIDC 失敗 (`AssumeRoleWithWebIdentity`)**  
-  信頼ポリシー・変数設定を見直し、Roles/Environment/Vars の整合を取って解消。
+### API / 運用
+- Docker 実運用化の手順を README に追記（`--workers 2` 推奨）。
+- `/reload?path=...` によるモデル切替の実地確認を追加（adult/credit-g で動作確認）。
+- P50/P95 計測手順（`williamyeh/hey` コンテナ）を README に追加。結果貼り付け用のテンプレも記載。
 
-### Notes
-- ローカルと CI の両経路で S3 同期が可能に（CI は学習→同期、ローカルは `make s3-push`）。
-- 既存機能や API 仕様の破壊的変更なし。
+### Training（結果）
+- `adult` を full で複数回実行（seed 変更の追試準備）。
+  - 代表ログ（JST）:
+    - `AUC=0.9257 / ACC=0.8726 / best={'lr':0.1,'max_depth':4,'leaf':31} / 18s`
+    - `AUC=0.9255 / ACC=0.8707 / best={'lr':0.1,'max_depth':4,'leaf':31} / 18s`
+    - `AUC=0.9259 / ACC=0.8729 / best={'lr':0.1,'max_depth':4,'leaf':31} / 18s`
+    - `AUC=0.9262 / ACC=0.8719 / best={'lr':0.1,'max_depth':4,'leaf':31} / 22s`
+    - `AUC=0.9256 / ACC=0.8706 / best={'lr':0.1,'max_depth':4,'leaf':31} / 18s`
+- `artifacts/summary_openml_adult.json` と `models/model_openml_adult.joblib` を更新。
+
+### Docs
+- README に以下を追記・整理:
+  - ECR へのリリース手順と成功スクリーンショット
+  - S3 モデル棚（`models/<ver>/` と `models/latest/`）の運用メモ
+  - ベンチ手順（RPS/Avg/P50/P95 の抜粋方法）
+  - Docker 起動例と `/reload` 切替例
+
+**Breaking Changes:** なし
 
 
 ## 2025-09-06
