@@ -1,0 +1,58 @@
+name: Publish models to S3
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'models/**'
+      - 'artifacts/**'
+jobs:
+  s3:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+
+      - name: Generate manifest
+        run: |
+          python - <<'PY'
+          # 同じmanifest生成スクリプト。省略可、Make使ってもよい
+          import hashlib, json, os, glob, time
+          def sha(p):
+              import hashlib
+              h=hashlib.sha256()
+              with open(p,'rb') as f:
+                  for b in iter(lambda:f.read(1<<20), b''): h.update(b)
+              return h.hexdigest()
+          files=[]
+          for d in ("models","artifacts"):
+              if not os.path.isdir(d): continue
+              for p in sorted(glob.glob(d+"/**/*", recursive=True)):
+                  if os.path.isfile(p):
+                      files.append({"path":p, "sha256":sha(p), "size":os.path.getsize(p)})
+          out={"generated_utc":time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "files":files}
+          os.makedirs("artifacts", exist_ok=True)
+          open("artifacts/manifest.json","w").write(json.dumps(out, indent=2))
+          PY
+
+      - name: Configure AWS (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+
+      - name: Sync to S3
+        env:
+          S3_BUCKET: ${{ vars.S3_BUCKET }}
+        run: |
+          TS=$(date -u +%Y%m%dT%H%M%SZ)
+          aws s3 sync models     ${S3_BUCKET}/models/${TS}/     --only-show-errors || true
+          aws s3 sync artifacts  ${S3_BUCKET}/artifacts/${TS}/  --only-show-errors || true
+          aws s3 cp artifacts/manifest.json ${S3_BUCKET}/artifacts/${TS}/ --only-show-errors
+          aws s3 sync models     ${S3_BUCKET}/models/latest/    --delete --only-show-errors
+          aws s3 sync artifacts  ${S3_BUCKET}/artifacts/latest/ --delete --only-show-errors
