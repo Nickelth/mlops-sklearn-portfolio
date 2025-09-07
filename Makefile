@@ -2,8 +2,8 @@
 SHELL := /bin/bash
 .SHELLFLAGS := -o pipefail -c
 
-.PHONY: init train train-fast train-full train-both api api-bg check envinfo clean \
-		report-md docker-build docker-run docker-run-baked docker-stop
+.PHONY: init train train-file train-fast train-full train-both api api-bg check envinfo clean \
+		report-md docker-build docker-run docker-run-baked docker-stop deps
 
 VENV ?= venv
 STAMP := $(VENV)/.ok
@@ -24,10 +24,21 @@ BLAS := OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_T
 DS ?= builtin
 MODE ?= fast
 
-train: | $(STAMP)
+# 依存（pandas / sklearn が無ければ入れる）
+deps: | $(STAMP)
+	@$(PY) -c "import sklearn, pandas" 2>/dev/null || $(PY) -m pip install -e .[dev]
+
+# ===== 学習（CI向け: 標準出力にも流す） =====
+train: deps
 	mkdir -p logs models cache artifacts
-	env $(BLAS) nice -n 10 $(PY) src/train.py --dataset $(DS) --mode $(MODE) \
-		> logs/train-$(TS).log 2>&1
+	env $(BLAS) nice -n 10 $(PY) src/train.py --dataset $(DS) --mode $(MODE) 2>&1 | tee logs/train-$(TS).log
+	@echo "=== TRAIN DONE ==="
+
+# ===== 学習（静音: ログファイルのみ） =====
+train-file: deps
+	mkdir -p logs models cache artifacts
+	env $(BLAS) nice -n 10 $(PY) src/train.py --dataset $(DS) --mode $(MODE) > logs/train-$(TS).log 2>&1
+	@echo "=== TRAIN DONE ==="
 
 train-fast:
 	$(MAKE) train MODE=fast
@@ -59,12 +70,11 @@ artifacts:
 	mkdir -p artifacts
 
 report-md:
-	@python scripts/log_report.py > artifacts/report.md
+	@$(PY) scripts/log_report.py > artifacts/report.md
 
 clean:
 	rm -rf cache __pycache__
 
-# 末尾あたりに追記
 IMAGE ?= mlops-sklearn-portfolio:local
 PORT  ?= 8000
 MODEL_PATH ?= /app/models/model_openml_adult.joblib
