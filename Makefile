@@ -3,7 +3,7 @@ SHELL := /bin/bash
 .SHELLFLAGS := -o pipefail -c
 
 .PHONY: init train train-file train-fast train-full train-both api api-bg check envinfo clean \
-		report-md docker-build docker-run docker-run-baked docker-stop deps
+		report-md docker-build docker-run docker-run-baked docker-stop deps bench model-pull-reload
 
 VENV ?= venv
 STAMP := $(VENV)/.ok
@@ -49,6 +49,20 @@ train-full:
 train-both:
 	$(MAKE) train DS=adult MODE=$(MODE)
 	$(MAKE) train DS=credit-g MODE=$(MODE)
+
+bench:
+	@mkdir -p artifacts
+	@printf '%s\n' '{"features":{"age":39,"education":"Bachelors","hours-per-week":40}}' > /tmp/payload.json
+	@TS=$$(date +%Y%m%d_%H%M%S); \
+	docker run --rm --net host -v /tmp/payload.json:/payload.json:ro williamyeh/hey \
+		-z 30s -c 16 -m POST -T 'application/json' -D /payload.json http://127.0.0.x:8000/predict \
+		| tee artifacts/bench-$$TS.txt; \
+	grep -E 'Requests/sec|Avg|50%|95%' artifacts/bench-$$TS.txt || true
+
+model-pull-reload:
+	@test -n "$(S3_BUCKET)" || (echo "ERROR: set S3_BUCKET"; exit 1)
+	$(AWSCLI) s3 sync $(S3_BUCKET)/latest/models/ models/ --only-show-errors
+	curl -s -X POST "http://localhost:8000/reload?path=$(MODEL_PATH)" | jq .
 
 api:
 	uvicorn api.app:app --host 0.0.0.x --port 8000
