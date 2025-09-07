@@ -21,10 +21,18 @@ jobs:
       - name: Install deps
         run: pip install -e .[dev]
 
+      - name: Sanity (envinfo)
+        run: |
+            python - <<'PY'
+            import sys, sklearn, pandas
+            print("py", sys.version.split()[0], "sklearn", sklearn.__version__, "pandas", pandas.__version__)
+            PY
+
       - name: Train (adult full)
         run: |
-          export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
-          make train-full DS=adult
+            export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
+            make train-full DS=adult
+
 
       - name: Generate manifest
         run: |
