@@ -82,24 +82,31 @@ def main() -> None:
 
     pre = build_preprocessor(X)
 
-    pipe = Pipeline(
-        steps=[("pre", pre), ("clf", HistGradientBoostingClassifier(random_state=42))],
-        memory=Memory("cache", verbose=0),
-    )
-
-    # 探索空間
-    param_grid = {
-        "clf__max_depth": [None, 4, 8],
-        "clf__learning_rate": [0.05, 0.1, 0.2],
-        "clf__max_leaf_nodes": [31, 63, 127],
-    }
-
     # 速度/品質の切替
     n_splits = 3 if args.mode == "fast" else 5
     factor   = 2 if args.mode == "fast" else 3
     n_jobs   = 8  # i7-9700 実コア
 
-    cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
+    SEED = int(os.getenv("SEED", "42"))
+    cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=SEED)
+
+    pipe = Pipeline(
+        steps=[("pre", pre), ("clf", HistGradientBoostingClassifier(random_state=SEED))],
+        memory=Memory("cache", verbose=0),
+    )
+
+    # パラメータグリッドも環境変数で上書き
+    import ast
+    def _maybe(env, default):
+        v = os.getenv(env)
+        return ast.literal_eval(v) if v else default
+
+    param_grid = {
+        "clf__max_depth": _maybe("GRID_DEPTH", [None, 4, 8]),
+        "clf__learning_rate": _maybe("GRID_LR", [0.05, 0.1, 0.2]),
+        "clf__max_leaf_nodes": _maybe("GRID_LEAFS", [31, 63, 127]),
+    }
+
     min_res = compute_min_resources(y, n_splits, args.mode)
 
     os.makedirs("artifacts", exist_ok=True)
