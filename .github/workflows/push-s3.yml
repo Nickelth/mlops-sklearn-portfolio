@@ -18,6 +18,14 @@ jobs:
         uses: actions/setup-python@v5
         with: { python-version: '3.12' }
 
+      - name: Install deps
+        run: pip install -e .[dev]
+
+      - name: Train (adult full)
+        run: |
+          export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
+          make train-full DS=adult
+
       - name: Generate manifest
         run: |
           python - <<'PY'
