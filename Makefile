@@ -170,3 +170,9 @@ docker-push: docker-build ecr-login
 	docker tag $(IMAGE) $(ECR_URI):latest
 	docker push $(ECR_URI):$(TAG)
 	docker push $(ECR_URI):latest
+
+# ==== F1 最大点と閾値を算出 ====
+.PHONY: threshold
+threshold: | $(STAMP)
+	# 既存モデルを使って PR 曲線から F1 最大閾値を算出し artifacts/threshold.json を更新
+	env $(BLAS) $(PY) src/opt_threshold.py --dataset $(DS)
