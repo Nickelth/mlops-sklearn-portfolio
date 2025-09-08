@@ -1,3 +1,48 @@
+## 2025-09-09
+
+### 閾値最適化（PR曲線×F1最大）
+
+```bash
+$ make threshold DS=adult
+env OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 venv/bin/python -u src/opt_threshold.py --dataset adult
+[THRESH] ds=openml_adult thr=0.3404 F1=0.7098 P=0.6565 R=0.7725 n_pos=2338 n_neg=7431 -> artifacts/threshold_openml_adult.json
+```
+#### 結果確認
+```bash
+$ jq . artifacts/threshold.json
+
+{
+  "dataset": "openml_adult",
+  "model_path": "model_openml_adult.joblib",
+  "threshold": 0.34036066486536937,
+  "precision": 0.6564885496183206,
+  "recall": 0.7724550898203593,
+  "f1": 0.7097661623103698,
+  "curve_points": 6429,
+  "n_pos": 2338,
+  "n_neg": 7431,
+  "generated_at": 1757359859
+}
+```
+
+```bash
+$ jq . artifacts/threshold_openml_adult.json
+{
+  "dataset": "openml_adult",
+  "model_path": "model_openml_adult.joblib",
+  "threshold": 0.34036066486536937,
+  "precision": 0.6564885496183206,
+  "recall": 0.7724550898203593,
+  "f1": 0.7097661623103698,
+  "curve_points": 6429,
+  "n_pos": 2338,
+  "n_neg": 7431,
+  "generated_at": 1757359859
+}
+```
+
+## 2025-09-07
+
 Summary:
   Total:        60.0243 secs
   Slowest:      0.2173 secs
