@@ -1,5 +1,27 @@
 # Changelog
 
+## 2025-09-09
+
+### ユーティリティ新規作成
+
+- `src/opt_threshold.py` を追加。
+  - 役割: 学習に使ったのと同一ルールの `holdout` 分割で `y_true` と `score` を作り、`precision_recall_curve` から F1 最大点と閾値を算出して保存。
+  - 出力: `artifacts/threshold_<ds>.json `を作成し、`artifacts/threshold.json` へもシンボリックリンク（無理ならコピー）。
+
+### Makefile 連携
+
+- `make threshold DS=adult` で走るターゲットを追加。
+- 既存 `venv/BLAS` 設定はそのまま引き継ぎ。
+
+### 実行 & 確認
+
+- `make threshold DS=adult`, `jq . artifacts/threshold.json` で内容確認。
+
+### 軽いテスト
+
+- 軽いスモーク: `tests/test_threshold.py`（実行→JSONのキー存在だけ検証）。
+- `venv/bin/pytest -q tests/test_threshold.py`
+
 ## 2025-09-07
 
 ### Infra / ECR
