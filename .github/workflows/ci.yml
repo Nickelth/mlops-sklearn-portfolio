@@ -2,7 +2,11 @@ name: CI
 
 on:
   push:
-    branches: ["**"]
+    branches: ["main"]
+    paths-ignore:
+      - "**.md"
+      - ".github/**"
+
   pull_request:
   workflow_dispatch:
 
@@ -40,14 +44,26 @@ jobs:
           python -m pip install -U pip
           pip install -e .[dev]
 
+      # API が読む学習済みモデルを用意
+      - name: Prepare model for API smoke (adult fast)
+        env:
+          OMP_NUM_THREADS: "1"
+          OPENBLAS_NUM_THREADS: "1"
+          MKL_NUM_THREADS: "1"
+          NUMEXPR_NUM_THREADS: "1"
+        run: |
+          make train-fast DS=adult
+          ls -lh models/
+
+      # ログを捨てずにファイルへ。失敗時に中身を吐く
       - name: Boot API in background
         run: |
-          uvicorn api.app:app --host 127.0.0.1 --port 8000 >/dev/null 2>&1 &
+          uvicorn api.app:app --host 127.0.0.1 --port 8000 > api.log 2>&1 &
           for i in $(seq 1 100); do
             curl -sf http://127.0.0.1:8000/health >/dev/null && break
             sleep 0.2
           done
-          curl -sf http://127.0.0.1:8000/health
+          curl -sf http://127.0.0.1:8000/health || { echo "==== api.log ===="; sed -n '1,200p' api.log; exit 1; }
 
       - name: Run tests (fast only)
         run: |
