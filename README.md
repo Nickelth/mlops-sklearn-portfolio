@@ -3,8 +3,8 @@
 scikit-learn + Pipeline で表形式MLを**学習→成果物→推論API→コンテナ**まで最短導線で通すポートフォリオ。
 
 [![CI](https://github.com/Nickelth/mlops-sklearn-portfolio/actions/workflows/ci.yml/badge.svg)](../../actions)
-[![CI](https://github.com/Nickelth/mlops-sklearn-portfolio/actions/workflows/release-ecr.yml/badge.svg)](../../actions)
-[![CI](https://github.com/Nickelth/mlops-sklearn-portfolio/actions/workflows/push-s3.yml/badge.svg)](../../actions)
+[![Release to ECR](https://github.com/Nickelth/mlops-sklearn-portfolio/actions/workflows/release-ecr.yml/badge.svg)](../../actions)
+[![Publish Models to S3 Bucket](https://github.com/Nickelth/mlops-sklearn-portfolio/actions/workflows/push-s3.yml/badge.svg)](../../actions)
 
 ## ルール
 
