@@ -43,8 +43,18 @@ api/  src/  models/  artifacts/  logs/  tests/  docs/
 - /reload の切替所要時間（ms）
 - S3 latest/ とスナップショットの両立運用方針（既に書いてるならリンクだけ）
 
-### 閾値最適化（PR曲線×F1最大）
+### 閾値最適化（PR曲線×F1最大）(2025-09-09)
 
 - `make threshold DS=adult` で holdout 上の PR 曲線から F1 最大となる閾値を算出。
 - 出力: `artifacts/threshold_<dataset>.json` と `artifacts/threshold.json`（共通名）。
 - 将来: API 側で `?mode=binary` 時にこの閾値を使用する切替を追加予定。
+
+### Permutation Importance（列単位・PNG出力）(2025-09-09)
+- 生成: `make perm DS=adult REPEATS=8 MAXS=4000`
+- 出力: `artifacts/perm_importance_openml_adult.png`（図）と `.csv` / `.json`
+- 参考: 今回のベースライン AUC ≈ 0.91（holdout, scorer=roc_auc）
+
+![Permutation importance (adult)](artifacts/perm_importance_openml_adult.png)
+
+- コマンド結果は`docs/result.md`を参照
+

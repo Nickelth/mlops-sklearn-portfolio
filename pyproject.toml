@@ -9,7 +9,7 @@ description = "Tabular ML with scikit-learn: pipeline, CV, FastAPI, and ECS depl
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "ryot" }]
+authors = [{ name = "user" }]
 
 dependencies = [
   "pandas>=2.2",
