@@ -176,3 +176,16 @@ docker-push: docker-build ecr-login
 threshold: | $(STAMP)
 	# 既存モデルを使って PR 曲線から F1 最大閾値を算出し artifacts/threshold.json を更新
 	env $(BLAS) $(PY) src/opt_threshold.py --dataset $(DS)
+
+# ==== Permutation 重要度スクリプト ====
+# ==== Permutation Importance をPNG/CSV/JSONで artifacts/ に出力 ====
+REPEATS ?= 10
+MAXS    ?= 5000
+
+.PHONY: perm
+perm: | $(STAMP)
+	env $(BLAS) $(PY) src/perm_importance.py --dataset $(DS) --n-repeats $(REPEATS) --max-samples $(MAXS)
+perm-adult:
+	$(MAKE) perm DS=adult  REPEATS=$(REPEATS) MAXS=$(MAXS)
+perm-credit:
+	$(MAKE) perm DS=credit-g REPEATS=$(REPEATS) MAXS=$(MAXS)
