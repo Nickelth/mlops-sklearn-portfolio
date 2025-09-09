@@ -1,5 +1,18 @@
 ## 2025-09-09
 
+### Permutation Importance（列単位・PNG出力）
+
+```bash
+$ make perm DS=adult REPEATS=8 MAXS=4000
+env OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 venv/bin/python -u src/perm_importance.py --dataset adult --n-repeats 8 --max-samples 4000
+[PERM] ds=openml_adult baseline=0.9097 repeats=8 features=14 -> artifacts/perm_importance_openml_adult.png
+
+$ ls -lh artifacts/perm_importance_openml_adult.*
+-rw-rw-r-- 1 user user 784  9月  9 22:56 artifacts/perm_importance_openml_adult.csv
+-rw-rw-r-- 1 user user 606  9月  9 22:56 artifacts/perm_importance_openml_adult.json
+-rw-rw-r-- 1 user user 86K  9月  9 22:56 artifacts/perm_importance_openml_adult.png
+```
+
 ### 閾値最適化（PR曲線×F1最大）
 
 ```bash
@@ -8,6 +21,7 @@ env OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREA
 [THRESH] ds=openml_adult thr=0.3404 F1=0.7098 P=0.6565 R=0.7725 n_pos=2338 n_neg=7431 -> artifacts/threshold_openml_adult.json
 ```
 #### 結果確認
+
 ```bash
 $ jq . artifacts/threshold.json
 
