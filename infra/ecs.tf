@@ -122,9 +122,6 @@ resource "aws_ecs_task_definition" "api" {
   ])
 }
 
-# 必要なら region 変数（outputs にも使う）
-variable "aws_region" { type=string default="us-west-2" }
-
 # Service（ALB の TG にぶら下げる / パブリックIPを付与してまずは動かす）
 resource "aws_ecs_service" "api" {
   name            = "mlops-api-svc"
