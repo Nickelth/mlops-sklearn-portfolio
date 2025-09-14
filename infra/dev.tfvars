@@ -1,4 +1,4 @@
 project     = "mlops-sklearn-portfolio"
 region      = "us-west-2"
 bucket_name = "nickelth-mlops-artifacts"
-# force_destroy = true  # 開発中だけ一時的に。基本はfalse
+force_destroy = false
