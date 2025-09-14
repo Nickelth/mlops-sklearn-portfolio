@@ -14,3 +14,8 @@ variable "force_destroy" {
   default     = false
   description = "Allow bucket force destroy (dev only; usually false)"
 }
+
+variable "region" {
+  type = string
+  description = "AWS region (e.g. us-west-2)"
+}
