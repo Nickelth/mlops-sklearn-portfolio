@@ -33,7 +33,7 @@ data "aws_iam_policy_document" "bucket_policy" {
     effect  = "Deny"
     actions = ["s3:*"]
     principals { 
-      type = "*", 
+      type = "*"
       identifiers = ["*"] 
     }
     resources = [
