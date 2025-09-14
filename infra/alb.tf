@@ -1,11 +1,11 @@
 resource "aws_lb" "api" {
-  name               = "mlops-api-alb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb.id]
-  subnets            = data.aws_subnets.default.ids
+  name                       = "mlops-api-alb"
+  internal                   = false
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.alb.id]
+  subnets                    = data.aws_subnets.default.ids
   enable_deletion_protection = false
-  tags = { Project = "mlops-sklearn-portfolio" }
+  tags                       = { Project = "mlops-sklearn-portfolio" }
 }
 
 resource "aws_lb_target_group" "api" {
