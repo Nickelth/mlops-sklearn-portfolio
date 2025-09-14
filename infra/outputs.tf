@@ -7,6 +7,9 @@ output "tg_arn" { value = aws_lb_target_group.api.arn }
 output "log_group_name" { value = aws_cloudwatch_log_group.api.name }
 output "tfstate_bucket" { value = "nickelth-tfstate" }
 output "dynamodb_lock_table" { value = "tf-lock" }
+<<<<<<< HEAD
 output "cluster_name" { value = aws_ecs_cluster.this.name }
 output "service_name" { value = aws_ecs_service.api.name }
 output "taskdef_arn" { value = aws_ecs_task_definition.api.arn }
+=======
+>>>>>>> 562f880 (feat(infra): WIP network/alb/s3/outputs)
