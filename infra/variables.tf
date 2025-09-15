@@ -19,3 +19,13 @@ variable "region" {
   type = string
   description = "AWS region (e.g. us-west-2)"
 }
+
+variable "ecr_repo" {
+  type    = string
+  default = "mlops-sklearn-portfolio"
+}
+
+variable "container_port" {
+  type    = number
+  default = 8000
+}
