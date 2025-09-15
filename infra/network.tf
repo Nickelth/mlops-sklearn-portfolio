@@ -50,3 +50,13 @@ resource "aws_security_group" "tasks" {
 
   tags = { Project = "mlops-sklearn-portfolio" }
 }
+
+# ALBのSG -> ECSタスクのSG へ 8000/TCP を許可
+resource "aws_security_group_rule" "alb_to_tasks_8000" {
+  type                     = "ingress"
+  from_port                = var.container_port
+  to_port                  = var.container_port
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.tasks.id
+  source_security_group_id = aws_security_group.alb.id
+}
