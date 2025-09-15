@@ -1,121 +1,151 @@
-# infra/ecs.tf  —— 重複ナシ版（既存 network.tf / log.tf を参照）
-
-# 既存: data.aws_vpc.default, data.aws_subnets.default（network.tf）
-# 既存: aws_security_group.alb, aws_security_group.tasks（network.tf）
-# 既存: aws_cloudwatch_log_group.api（log.tf）
-# 既存: aws_lb_target_group.api / aws_lb (alb.tf 相当) を想定
-
-variable "ecr_repo"        { type = string }                 # 例: 1234....dkr.ecr.us-west-2.amazonaws.com/mlops-sklearn-portfolio
-variable "image_tag"       { 
-    type = string  
-    default = "latest"
-}
-variable "container_port"  { 
-    type = number  
-    default = 8000
+############################
+# ECS Cluster
+############################
+resource "aws_ecs_cluster" "this" {
+  name = "mlops-ecs"
+  setting { name = "containerInsights" value = "enabled" }
+  tags = { Project = "mlops-sklearn-portfolio" }
 }
 
-# タスク実行ロール（ECR pull / CloudWatch Logs）
-resource "aws_iam_role" "exec" {
-  name               = "${var.project}-ecs-exec"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{ 
-        Effect="Allow", 
-        Principal={ Service="ecs-tasks.amazonaws.com" }, 
-        Action="sts:AssumeRole" 
-    }]
-  })
+############################
+# IAM (Execution / Task)
+############################
+data "aws_iam_policy_document" "ecs_tasks_trust" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals { 
+      type = "Service" 
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
+  }
 }
-resource "aws_iam_role_policy_attachment" "exec_ecr_logs" {
-  role       = aws_iam_role.exec.name
+
+resource "aws_iam_role" "task_execution" {
+  name               = "mlops-ecsTaskExecutionRole"
+  assume_role_policy = data.aws_iam_policy_document.ecs_tasks_trust.json
+  tags = { Project = "mlops-sklearn-portfolio" }
+}
+
+resource "aws_iam_role_policy_attachment" "exec_managed" {
+  role       = aws_iam_role.task_execution.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# タスクロール（必要に応じて SSM/Secrets ポリシーを別途付与）
-resource "aws_iam_role" "task" {
-  name               = "${var.project}-ecs-task"
-  assume_role_policy = aws_iam_role.exec.assume_role_policy
+# アプリ用（必要最小。今は空でOK）
+resource "aws_iam_role" "task_role" {
+  name               = "mlops-ecsTaskRole"
+  assume_role_policy = data.aws_iam_policy_document.ecs_tasks_trust.json
+  tags = { Project = "mlops-sklearn-portfolio" }
 }
 
-# ALB からタスク:8000 への INGRESS を追加（tasks SG は network.tf の既存）
-resource "aws_security_group_rule" "alb_to_tasks_8000" {
+############################
+# ECR image (:latest)
+############################
+variable "ecr_repo" { type = string, default = "mlops-sklearn-portfolio" }
+data "aws_ecr_repository" "repo" { name = var.ecr_repo }
+locals {
+  image_uri = "${data.aws_ecr_repository.repo.repository_url}:latest"
+}
+
+############################
+# セキュリティグループ（ALB→タスク）
+############################
+# network.tfで作ったSGに“ALBから8000/TCPだけ開ける”を追加
+resource "aws_security_group_rule" "tasks_from_alb_8000" {
   type                     = "ingress"
-  from_port                = var.container_port
-  to_port                  = var.container_port
-  protocol                 = "tcp"
   security_group_id        = aws_security_group.tasks.id
+  from_port                = 8000
+  to_port                  = 8000
+  protocol                 = "tcp"
   source_security_group_id = aws_security_group.alb.id
-  description              = "Allow ALB to tasks on ${var.container_port}/tcp"
 }
 
-# ECS Cluster
-resource "aws_ecs_cluster" "api" {
-  name = "${var.project}-cluster"
+############################
+# Task Definition
+############################
+resource "aws_cloudwatch_log_group" "api_ref" {
+  # 既存 /mlops/api を参照したいが module間依存回避で同名作成OK（同名既存ならno-op）
+  name              = "/mlops/api"
+  retention_in_days = 30
 }
 
-# Task Definition（Fargate）
+locals {
+  container_name = "api"
+  container_port = 8000
+  env_base = [
+    { name = "MODEL_PATH", value = "/app/models/model_openml_adult.joblib" },
+    { name = "LOG_JSON",   value = "1" },
+    # /metrics で使う予定のダミー
+    { name = "APP_VERSION", value = "v0-dev" },
+    { name = "GIT_SHA",     value = "TBD" },
+  ]
+}
+
 resource "aws_ecs_task_definition" "api" {
-  family                   = "${var.project}-task"
-  requires_compatibilities = ["FARGATE"]
-  network_mode             = "awsvpc"
+  family                   = "mlops-api"
   cpu                      = "256"
   memory                   = "512"
-  execution_role_arn       = aws_iam_role.exec.arn
-  task_role_arn            = aws_iam_role.task.arn
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  execution_role_arn       = aws_iam_role.task_execution.arn
+  task_role_arn            = aws_iam_role.task_role.arn
 
   container_definitions = jsonencode([
     {
-      name      = "api"
-      image     = "${var.ecr_repo}:${var.image_tag}"
-      essential = true
+      name  = local.container_name
+      image = local.image_uri
       portMappings = [{ 
-        containerPort = var.container_port, 
-        hostPort = var.container_port, 
-        protocol = "tcp"
-        }]
-      environment = [
-        { 
-            name = "MODEL_PATH", 
-            value = "/app/models/model_openml_adult.joblib"
-        },
-        { 
-            name = "LOG_JSON",   
-            value = "1"
-        }
-      ]
-      command = ["uvicorn","api.app:app","--host","0.0.0.0","--port", tostring(var.container_port)]
+        ontainerPort = local.container_port, 
+        hostPort = local.container_port, 
+        protocol = "tcp" 
+      }]
+      essential = true
+      environment = local.env_base
       logConfiguration = {
-        logDriver = "awslogs",
+        logDriver = "awslogs"
         options = {
-          awslogs-group         = aws_cloudwatch_log_group.api.name,
-          awslogs-region        = var.region,            # ← providers.tf/variables.tf の既存 var.region を利用
+          awslogs-group         = aws_cloudwatch_log_group.api_ref.name
+          awslogs-region        = var.region
           awslogs-stream-prefix = "api"
         }
       }
     }
   ])
+
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = "X86_64"
+  }
+
+  tags = { Project = "mlops-sklearn-portfolio" }
 }
 
-# Service（ALB TG にぶら下げる / まずは Public IP で起動確認）
+############################
+# Service (Fargate 1タスク / ALB配下)
+############################
 resource "aws_ecs_service" "api" {
-  name            = "${var.project}-svc"
-  cluster         = aws_ecs_cluster.api.id
+  name            = "mlops-api-svc"
+  cluster         = aws_ecs_cluster.this.id
   task_definition = aws_ecs_task_definition.api.arn
   desired_count   = 1
   launch_type     = "FARGATE"
 
-  network_configuration {
-    subnets          = data.aws_subnets.default.ids
-    security_groups  = [aws_security_group.tasks.id]
-    assign_public_ip = true
-  }
-
   load_balancer {
     target_group_arn = aws_lb_target_group.api.arn
-    container_name   = "api"
-    container_port   = var.container_port
+    container_name   = local.container_name
+    container_port   = local.container_port
   }
 
-  depends_on = [aws_security_group_rule.alb_to_tasks_8000]
+  network_configuration {
+    assign_public_ip = true
+    subnets          = data.aws_subnets.default.ids
+    security_groups  = [aws_security_group.tasks.id]
+  }
+
+  lifecycle {
+    ignore_changes = [task_definition] # 後日のローリング更新時に便利
+  }
+
+  depends_on = [aws_lb_listener.http, aws_security_group_rule.tasks_from_alb_8000]
+  tags = { Project = "mlops-sklearn-portfolio" }
 }

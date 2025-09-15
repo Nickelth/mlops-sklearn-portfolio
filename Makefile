@@ -160,12 +160,22 @@ REPO_NAME ?= mlops-sklearn-portfolio
 ECR_URI   ?= $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(REPO_NAME)
 TAG ?= v$(shell date +%Y%m%d)-1
 
-.PHONY: ecr-login docker-push
+.PHONY: ecr-login docker-push docker-push-local
+# ===== CI前提: デフォは案内だけ =====
+docker-push:
+	@echo "[info] Docker push は GitHub Actions (release-ecr.yml) で実施します。"
+	@echo "       手元から ECR へ push したい場合は: make docker-push-local LOCAL_PUSH=1"
+	@echo "       例: IMAGE=mlops-sklearn-portfolio:local TAG=vYYYYMMDD-1"
+	@exit 0
+
+# ===== 手元から push したい強者向け（明示フラグ必須） =====
 ecr-login:
+	@[ "$(LOCAL_PUSH)" = "1" ] || (echo "[guard] LOCAL_PUSH=1 を指定してください。"; exit 2)
 	aws ecr get-login-password --region $(AWS_REGION) \
 	| docker login --username AWS --password-stdin $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
 
-docker-push: docker-build ecr-login
+docker-push-local: docker-build ecr-login
+	@[ "$(LOCAL_PUSH)" = "1" ] || (echo "[guard] LOCAL_PUSH=1 を指定してください。"; exit 2)
 	docker tag $(IMAGE) $(ECR_URI):$(TAG)
 	docker tag $(IMAGE) $(ECR_URI):latest
 	docker push $(ECR_URI):$(TAG)
