@@ -203,38 +203,37 @@ perm-credit:
 # =========
 # Settings
 # =========
-TFDIR ?= infra
-WORKDIR ?= /tmp/infra
+TFDIR = infra
+WORKDIR = /tmp/infra
+TF_VARS = -var="aws_region=$(AWS_REGION)" -var="ecr_repository_url=$(ECR_URI)"
 
 .PHONY: prep tf-init tf-apply tf-destroy tf-output evidence clean-tmp
 
 prep:
-mkdir -p $(WORKDIR)
-rs_sync="rsync -a --delete"; $$rs_sync $(TFDIR)/ $(WORKDIR)/
+	mkdir -p $(WORKDIR)
+	rs_sync="rsync -a --delete"; $$rs_sync $(TFDIR)/ $(WORKDIR)/
 
 # CloudShell の容量回避で -chdir を使用
 tf-init: prep
-terraform -chdir=$(WORKDIR) init
-
-TF_VARS = -var="aws_region=$(AWS_REGION)" -var="ecr_repository_url=$(ECR_REPO_URL)"
+	terraform -chdir=$(WORKDIR) init
 
 tf-apply:
-terraform -chdir=$(WORKDIR) apply -auto-approve $(TF_VARS)
+	terraform -chdir=$(WORKDIR) apply -auto-approve $(TF_VARS)
 
 tf-destroy:
-terraform -chdir=$(WORKDIR) destroy -auto-approve $(TF_VARS)
+	terraform -chdir=$(WORKDIR) destroy -auto-approve $(TF_VARS)
 
 # ALB DNS を拾って evidence に保存
 tf-output:
-@DNS=$$(terraform -chdir=$(WORKDIR) output -raw alb_dns_name); \
-echo $$DNS | tee docs/evidence/2025-09-14_alb_dns.txt; \
-echo "http://$$DNS";
+	@DNS=$$(terraform -chdir=$(WORKDIR) output -raw alb_dns_name); \
+	echo $$DNS | tee docs/evidence/2025-09-14_alb_dns.txt; \
+	echo "http://$$DNS";
 
 # /health を叩いて保存（ALB の安定化を少し待つ）
 evidence:
-@sleep 10; \
-DNS=$$(terraform -chdir=$(WORKDIR) output -raw alb_dns_name); \
-curl -s -i "http://$$DNS/health" | tee docs/evidence/2025-09-14_health.txt
+	@sleep 10; \
+	DNS=$$(terraform -chdir=$(WORKDIR) output -raw alb_dns_name); \
+	curl -s -i "http://$$DNS/health" | tee docs/evidence/2025-09-14_health.txt
 
 clean-tmp:
-rm -rf $(WORKDIR)
+	rm -rf $(WORKDIR)
