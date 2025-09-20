@@ -23,9 +23,16 @@ variable "region" {
 variable "ecr_repo" {
   type    = string
   default = "mlops-sklearn-portfolio"
+  description = "ECR repository name or fully-qualified repository URI"
 }
 
 variable "container_port" {
   type    = number
   default = 8000
+}
+
+variable "image_tag" {
+  type        = string
+  default     = "latest"
+  description = "Container image tag to deploy"
 }
