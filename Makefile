@@ -203,8 +203,8 @@ perm-credit:
 # =========
 # Settings
 # =========
-TFDIR = infra
-WORKDIR = /tmp/infra
+TFDIR ?= infra
+WORKDIR ?= /tmp/infra
 
 .PHONY: prep tf-init tf-apply tf-destroy tf-output evidence clean-tmp
 
