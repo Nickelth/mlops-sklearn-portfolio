@@ -209,8 +209,9 @@ WORKDIR ?= /tmp/infra
 AWS_REGION ?= us-west-2
 AWS_ACCOUNT_ID ?= $(shell aws sts get-caller-identity --query Account --output text 2>/dev/null)
 REPO_NAME ?= mlops-sklearn-portfolio
+S3_BUCKET_NAME ?= nickelth-mlops-artifacts
 ECR_URI   ?= $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(REPO_NAME)
-TF_VARS = -var="region=$(AWS_REGION)" -var="ecr_repository_url=$(ECR_URI)"
+TF_VARS = -var="region=$(AWS_REGION)" -var="ecr_repository_url=$(ECR_URI)" -var="bucket_name=$(S3_BUCKET_NAME)" 
 RSYNC       ?= rsync
 RSYNC_FLAGS ?= -a --delete
 
