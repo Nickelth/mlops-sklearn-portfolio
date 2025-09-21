@@ -207,13 +207,23 @@ perm-credit:
 TFDIR ?= infra
 WORKDIR ?= /tmp/infra
 TF_VARS = -var="aws_region=$(AWS_REGION)" -var="ecr_repository_url=$(ECR_URI)"
-RSYNC   := rsync -a --delete
+RSYNC       ?= rsync
+RSYNC_FLAGS ?= -a --delete
 
 .PHONY: prep tf-init tf-apply tf-destroy tf-output evidence clean-tmp
 
+define SYNC_CMD
+if command -v $(RSYNC) >/dev/null 2>&1; then
+  $(RSYNC) $(RSYNC_FLAGS) "$(TFDIR)/" "$(WORKDIR)/"
+else
+  mkdir -p "$(WORKDIR)"
+  (cd "$(TFDIR)" && tar -cf - .) | (cd "$(WORKDIR)" && rm -rf ./* && tar -xf -)
+fi
+endef
+
 prep:
 >	mkdir -p $(WORKDIR)
->	@$(RSYNC) "$(TFDIR)/" "$(WORKDIR)/"
+>	@$(SYNC_CMD)
 
 # CloudShell の容量回避で -chdir を使用
 tf-init: prep
