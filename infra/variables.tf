@@ -42,9 +42,3 @@ variable "ecr_repository_url" {
   default     = ""
   description = "ECR repository URI, e.g. <ECR_REGISTRY>/mlops-sklearn-portfolio"
 }
-
-variable "bucket_name" {
-  type        = string
-  default     = ""
-  description = "ECR repository URI, e.g. <ECR_REGISTRY>/mlops-sklearn-portfolio"
-}
