@@ -36,3 +36,9 @@ variable "image_tag" {
   default     = "latest"
   description = "Container image tag to deploy"
 }
+
+variable "ecr_repository_url" {
+  type        = string
+  default     = ""
+  description = "ECR repository URI, e.g. <ECR_REGISTRY>/mlops-sklearn-portfolio"
+}
