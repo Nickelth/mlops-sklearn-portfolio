@@ -210,7 +210,7 @@ AWS_REGION ?= us-west-2
 AWS_ACCOUNT_ID ?= $(shell aws sts get-caller-identity --query Account --output text 2>/dev/null)
 REPO_NAME ?= mlops-sklearn-portfolio
 ECR_URI   ?= $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(REPO_NAME)
-TF_VARS = -var="aws_region=$(AWS_REGION)" -var="ecr_repository_url=$(ECR_URI)"
+TF_VARS = -var="region=$(AWS_REGION)" -var="ecr_repository_url=$(ECR_URI)"
 RSYNC       ?= rsync
 RSYNC_FLAGS ?= -a --delete
 

@@ -10,6 +10,15 @@ logs/
 /src/*.egg-info/
 *.egg-info/
 
+# Terraform state
+.terraform/
+*.tfstate
+*.tfstate.*
+.crc
+
+# Terraform plan files
+*.tfplan
+
 # Terraform build artifacts
 **/.terraform/
 *.tfstate
