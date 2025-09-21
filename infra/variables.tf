@@ -42,9 +42,3 @@ variable "ecr_repository_url" {
   default     = ""
   description = "ECR repository URI, e.g. 123456789012.dkr.ecr.us-west-2.amazonaws.com/mlops-sklearn-portfolio"
 }
-
-variable "bucket_name" {
-  type        = string
-  default     = ""
-  description = "ECR repository URI, e.g. 123456789012.dkr.ecr.us-west-2.amazonaws.com/mlops-sklearn-portfolio"
-}
