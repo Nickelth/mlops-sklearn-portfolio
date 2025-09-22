@@ -1,11 +1,14 @@
 # api/app.py
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
 from pydantic import BaseModel
 import joblib, pandas as pd, os, time, threading, logging, json
 from datetime import datetime
 from typing import List, Set, Optional
+import boto3
+from botocore.exceptions import BotoCoreError, ClientError
 
 MODEL_PATH = os.getenv("MODEL_PATH", "models/model_openml_adult.joblib")
+MODEL_S3_URI = os.getenv("MODEL_S3_URI")
 LOG_DIR = "logs"
 LOG_FILE = os.path.join(LOG_DIR, f"api-{datetime.now().strftime('%Y%m%d')}.log")
 
@@ -51,6 +54,27 @@ def load_model(path: str):
         _REQUIRED_COLS, _NUMERIC_COLS = _extract_columns_from_model(_model)
     return _model
 
+def _ensure_model_local():
+    """MODEL_PATH がローカルに無い場合、MODEL_S3_URI から取得を試みる。無ければ何もしない。"""
+    path = MODEL_PATH
+    if os.path.exists(path):
+        return path
+    if MODEL_S3_URI:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        try:
+            s3 = boto3.client("s3")
+            # s3://bucket/key を分解
+            if not MODEL_S3_URI.startswith("s3://"):
+                return None
+            _, _, rest = MODEL_S3_URI.partition("s3://")
+            bucket, _, key = rest.partition("/")
+            s3.download_file(bucket, key, path)
+            return path if os.path.exists(path) else None
+        except (BotoCoreError, ClientError) as e:
+            _json_log(ts=time.time(), event="model_download_failed", s3=MODEL_S3_URI, err=str(e))
+            return None
+    return None
+
 def _normalize_batch(rows: List[dict]) -> pd.DataFrame:
     # rows: [{col: val, ...}, ...]
     if not _REQUIRED_COLS:
@@ -75,8 +99,15 @@ class Rows(BaseModel):
 
 @app.on_event("startup")
 def _startup():
-    load_model(MODEL_PATH)
-    _json_log(ts=time.time(), event="startup", model=os.path.basename(MODEL_PATH))
+    # 起動時は“可能なら”モデルを用意。失敗してもアプリは起動継続。
+    local = _ensure_model_local()
+    if local:
+        try:
+            load_model(local)
+        except FileNotFoundError:
+            pass
+    _json_log(ts=time.time(), event="startup", model=os.path.basename(MODEL_PATH), exists=os.path.exists(MODEL_PATH))
+
 
 @app.middleware("http")
 async def access_log(request, call_next):
@@ -104,7 +135,13 @@ async def access_log(request, call_next):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "model": os.path.basename(MODEL_PATH), "ts": time.time(), "cols": len(_REQUIRED_COLS) or None}
+    return {
+        "status": "ok",
+        "model": os.path.basename(MODEL_PATH),
+        "ts": time.time(),
+        "cols": len(_REQUIRED_COLS) or None,
+        "model_exists": os.path.exists(MODEL_PATH)
+    }
 
 @app.get("/schema")
 def schema():
@@ -113,7 +150,10 @@ def schema():
 @app.post("/predict")
 def predict(item: Row):
     if _model is None:
-        load_model(MODEL_PATH)
+        local = _ensure_model_local()
+        if not local:
+            raise HTTPException(status_code=503, detail="Model not available")
+        load_model(local)
     X = _normalize_batch([item.features])
     proba = getattr(_model, "predict_proba", None)
     if proba:
@@ -123,7 +163,10 @@ def predict(item: Row):
 @app.post("/predict_batch")
 def predict_batch(items: Rows):
     if _model is None:
-        load_model(MODEL_PATH)
+        local = _ensure_model_local()
+        if not local:
+            raise HTTPException(status_code=503, detail="Model not available")
+        load_model(local)
     X = _normalize_batch(items.rows)
     proba = getattr(_model, "predict_proba", None)
     if proba:
@@ -133,5 +176,6 @@ def predict_batch(items: Rows):
 @app.post("/reload")
 def reload_model(path: Optional[str] = Query(None, description="モデルファイルへのパス")):
     # ?path=... があればそれを優先、無ければ現行 MODEL_PATH を再読込
-    load_model(path or MODEL_PATH)
+    target = path or _ensure_model_local() or MODEL_PATH
+    load_model(target)
     return {"status": "reloaded", "model": os.path.basename(MODEL_PATH)}

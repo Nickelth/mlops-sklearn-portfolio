@@ -15,47 +15,45 @@ resource "aws_ecs_cluster" "this" {
   tags = { Project = "mlops-sklearn-portfolio" }
 }
 
-resource "aws_ecs_task_definition" "api" {
-  family                   = "mlops-api-task"
-  cpu                      = "256"   # Fargate最小
-  memory                   = "512"
+resource "aws_ecs_task_definition" "app" {
+  family                   = "${project.name}-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
-  task_role_arn            = aws_iam_role.ecs_task_role.arn
+  cpu                      = 256
+  memory                   = 512
+
+  execution_role_arn = aws_iam_role.task_exec.arn
+  task_role_arn      = aws_iam_role.task_role.arn
 
   container_definitions = jsonencode([
     {
-      "name": "api",
-      "image": local.image_uri,
-      "essential": true,
-      "portMappings": [
-        { 
-          "containerPort": var.container_port, 
-          "hostPort": var.container_port, 
-          "protocol": "tcp" 
-        }
+      name      = "app",
+      image     = "${var.ecr_repository_url}:latest",
+      essential = true,
+      portMappings = [{
+        containerPort = var.container_port, hostPort = var.container_port, protocol = "tcp"
+      }],
+      environment = [
+        { name = "MODEL_PATH",   value = "models/model_openml_adult.joblib" },
+        { name = "MODEL_S3_URI", value = "s3://nickelth-mlops-artifacts/mlops-sklearn-portfolio/models/latest/model_openml_adult.joblib" },
+        { name = "LOG_JSON",     value = "1" },
+        { name = "VERSION",      value = "0.0.0-dev" },
+        { name = "GIT_SHA",      value = "0000000" }
       ],
-      "environment": [
-        { "name": "MODEL_PATH",        "value": "/app/models/model_openml_adult.joblib" },
-        { "name": "LOG_JSON",          "value": "1" },
-        # /metrics で使う予定のダミー環境変数（後で値をCIから注入）
-        { "name": "METRICS_VERSION",   "value": "vLOCAL" },
-        { "name": "METRICS_GIT_SHA",   "value": "unknown" }
-      ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group":  "/mlops/api",
-          "awslogs-region": var.region,
-          "awslogs-stream-prefix": "ecs"
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.app.name,
+          awslogs-region        = var.region,
+          awslogs-stream-prefix = "app"
         }
       }
+      # 最初はECSのhealthCheckは外す。ALBの健康診断だけに寄せる。
+      # healthCheck = { ... }  # ← 付けない
     }
   ])
-
-  tags = { Project = "mlops-sklearn-portfolio" }
 }
+
 
 resource "aws_ecs_service" "api" {
   name            = "mlops-api-svc"
@@ -89,4 +87,36 @@ resource "aws_ecs_service" "api" {
   ]
 
   tags = { Project = "mlops-sklearn-portfolio" }
+}
+
+# ========== Task Role（アプリ用の実行ロール） ==========
+resource "aws_iam_role" "task_role" {
+  name = "${project.name}-task-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Action = "sts:AssumeRole",
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+    }]
+  })
+}
+
+# モデル取得専用の最小権限（S3:GetObject）
+resource "aws_iam_policy" "s3_get_model" {
+  name = "${project.name}-s3-get-model"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Sid: "GetModelObject",
+      Effect: "Allow",
+      Action: ["s3:GetObject"],
+      Resource: "arn:aws:s3://nickelth-mlops-artifacts/mlops-sklearn-portfolio/models/latest/*"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "task_s3_attach" {
+  role       = aws_iam_role.task_role.name
+  policy_arn = aws_iam_policy.s3_get_model.arn
 }
