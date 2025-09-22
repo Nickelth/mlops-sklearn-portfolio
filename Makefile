@@ -214,6 +214,7 @@ ECR_URI   ?= $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(REPO_NAME)
 TF_VARS = -var="region=$(AWS_REGION)" -var="ecr_repository_url=$(ECR_URI)" -var="bucket_name=$(S3_BUCKET_NAME)" 
 RSYNC       ?= rsync
 RSYNC_FLAGS ?= -a --delete
+TS:=$(shell date +%Y%m%d_%H%M%S)
 
 .PHONY: prep tf-init tf-apply tf-destroy tf-output evidence clean-tmp
 
@@ -243,14 +244,14 @@ tf-destroy:
 # ALB DNS を拾って evidence に保存
 tf-output:
 >	@DNS=$$(terraform -chdir=$(WORKDIR) output -raw alb_dns_name); \
->	echo $$DNS | tee docs/evidence/2025-09-14_alb_dns.txt; \
+>	echo $$DNS | tee docs/evidence/$(TS)_alb_dns.txt; \
 >	echo "http://$$DNS";
 
 # /health を叩いて保存（ALB の安定化を少し待つ）
 evidence:
 >	@sleep 10; \
 >	DNS=$$(terraform -chdir=$(WORKDIR) output -raw alb_dns_name); \
->	curl -s -i "http://$$DNS/health" | tee docs/evidence/2025-09-14_health.txt
+>	curl -s -i "http://$$DNS/health" | tee docs/evidence/$(TS)_health.txt
 
 clean-tmp:
 >	rm -rf $(WORKDIR)
