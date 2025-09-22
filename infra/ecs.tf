@@ -92,7 +92,7 @@ resource "aws_ecs_service" "api" {
 
 # ========== Task Role（アプリ用の実行ロール） ==========
 resource "aws_iam_role" "task_role" {
-  name = "${locals.name}-task-role"
+  name = "${local.name}-task-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
@@ -105,7 +105,7 @@ resource "aws_iam_role" "task_role" {
 
 # モデル取得専用の最小権限（S3:GetObject）
 resource "aws_iam_policy" "s3_get_model" {
-  name = "${locals.name}-s3-get-model"
+  name = "${local.name}-s3-get-model"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
