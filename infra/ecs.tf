@@ -35,7 +35,7 @@ resource "aws_ecs_task_definition" "api" {
         containerPort = var.container_port, hostPort = var.container_port, protocol = "tcp"
       }],
       environment = [
-        { name = "MODEL_PATH",   value = "models/model_openml_adult.joblib" },
+        { name = "MODEL_PATH",   value = "/app/models/model_openml_adult.joblib" },
         { name = "MODEL_S3_URI", value = "s3://<BUCKET>/mlops-sklearn-portfolio/models/latest/model_openml_adult.joblib" },
         { name = "LOG_JSON",     value = "1" },
         { name = "VERSION",      value = "0.0.0-dev" },
