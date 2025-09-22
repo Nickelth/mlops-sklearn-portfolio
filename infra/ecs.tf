@@ -17,19 +17,19 @@ resource "aws_ecs_cluster" "this" {
 }
 
 resource "aws_ecs_task_definition" "api" {
-  family                   = "${project}-task"
+  family                   = "${var.project}-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = 256
   memory                   = 512
 
-  execution_role_arn = aws_iam_role.task_exec.arn
+  execution_role_arn = aws_iam_role.ecs_task_execution.arn
   task_role_arn      = aws_iam_role.task_role.arn
 
   container_definitions = jsonencode([
     {
-      name      = "app",
-      image     = "${var.ecr_repository_url}:latest",
+      name      = "api",
+      image     = var.ecr_repository_url != "" ? "${var.ecr_repository_url}:${var.image_tag}" : local.image_uri,
       essential = true,
       portMappings = [{
         containerPort = var.container_port, hostPort = var.container_port, protocol = "tcp"
@@ -40,13 +40,13 @@ resource "aws_ecs_task_definition" "api" {
         { name = "LOG_JSON",     value = "1" },
         { name = "VERSION",      value = "0.0.0-dev" },
         { name = "GIT_SHA",      value = "0000000" }
-      ],
+      ]
       logConfiguration = {
-        logDriver = "awslogs",
+        logDriver = "awslogs"
         options = {
-          awslogs-group         = aws_cloudwatch_log_group.app.name,
-          awslogs-region        = var.region,
-          awslogs-stream-prefix = "app"
+          awslogs-group         = aws_cloudwatch_log_group.api.name
+          awslogs-region        = var.region
+          awslogs-stream-prefix = "api"
         }
       }
       # 最初はECSのhealthCheckは外す。ALBの健康診断だけに寄せる。
@@ -109,10 +109,10 @@ resource "aws_iam_policy" "s3_get_model" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Sid: "GetModelObject",
-      Effect: "Allow",
-      Action: ["s3:GetObject"],
-      Resource: "arn:aws:s3://nickelth-mlops-artifacts/mlops-sklearn-portfolio/models/latest/*"
+      Sid      = "GetModelObject"
+      Effect   = "Allow"
+      Action   = ["s3:GetObject"]
+      Resource = "arn:aws:s3:::nickelth-mlops-artifacts/mlops-sklearn-portfolio/models/latest/*"
     }]
   })
 }
