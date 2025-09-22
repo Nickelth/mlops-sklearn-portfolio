@@ -15,8 +15,8 @@ resource "aws_ecs_cluster" "this" {
   tags = { Project = "mlops-sklearn-portfolio" }
 }
 
-resource "aws_ecs_task_definition" "app" {
-  family                   = "${project.name}-task"
+resource "aws_ecs_task_definition" "api" {
+  family                   = "${project}-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = 256
@@ -91,7 +91,7 @@ resource "aws_ecs_service" "api" {
 
 # ========== Task Role（アプリ用の実行ロール） ==========
 resource "aws_iam_role" "task_role" {
-  name = "${project.name}-task-role"
+  name = "${project}-task-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
@@ -104,7 +104,7 @@ resource "aws_iam_role" "task_role" {
 
 # モデル取得専用の最小権限（S3:GetObject）
 resource "aws_iam_policy" "s3_get_model" {
-  name = "${project.name}-s3-get-model"
+  name = "${project}-s3-get-model"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
