@@ -4,6 +4,7 @@ locals {
   # to an absolute URI before appending the tag supplied via var.image_tag.
   ecr_repository_uri = can(regex(".amazonaws.com/", var.ecr_repo)) ? var.ecr_repo : "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com/${var.ecr_repo}"
   image_uri = "${local.ecr_repository_uri}:${var.image_tag}"
+  name = "${var.project}-ecs"
 }
 
 resource "aws_ecs_cluster" "this" {
@@ -91,7 +92,7 @@ resource "aws_ecs_service" "api" {
 
 # ========== Task Role（アプリ用の実行ロール） ==========
 resource "aws_iam_role" "task_role" {
-  name = "${project}-task-role"
+  name = "${locals.name}-task-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
@@ -104,7 +105,7 @@ resource "aws_iam_role" "task_role" {
 
 # モデル取得専用の最小権限（S3:GetObject）
 resource "aws_iam_policy" "s3_get_model" {
-  name = "${project}-s3-get-model"
+  name = "${locals.name}-s3-get-model"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
