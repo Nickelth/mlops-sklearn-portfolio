@@ -9,3 +9,33 @@ logs/
 /*.egg-info/
 /src/*.egg-info/
 *.egg-info/
+
+# Terraform state
+.terraform/
+*.tfstate
+*.tfstate.*
+.crc
+
+# Terraform plan files
+*.tfplan
+
+# Terraform build artifacts
+**/.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Local overrides
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Sensitive vars (実ファイルはコミットしない)
+*.tfvars
+*.auto.tfvars
+
+# allow examples/templates
+!*.tfvars.example
+

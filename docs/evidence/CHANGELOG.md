@@ -1,5 +1,23 @@
 # Changelog
 
+````markdown
+## 2025-09-13
+
+### 作業
+- AWS CloudShell（Amazon Linux 2023）に **Terraform v1.13.2** をユーザー単位で導入（`~/bin/terraform`）。
+  - `~/.bashrc` に `export PATH="$HOME/bin:$PATH"` を追記し `source ~/.bashrc` を実行。
+  - 動作確認:
+    ```bash
+    $ terraform -version
+    Terraform v1.13.2
+    on linux_amd64
+    ```
+
+### 影響・備考
+- IaC 着手のための環境準備のみ。インフラ定義（`infra/` 以下）や `terraform init/plan` は次回作業で実施。
+````
+
+
 ## 2025-09-09
 
 ### ユーティリティ新規作成
