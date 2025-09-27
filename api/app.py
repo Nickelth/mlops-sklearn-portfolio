@@ -179,3 +179,19 @@ def reload_model(path: Optional[str] = Query(None, description="モデルファ�
     target = path or _ensure_model_local() or MODEL_PATH
     load_model(target)
     return {"status": "reloaded", "model": os.path.basename(MODEL_PATH)}
+
+# api/app.py の末尾あたりに追加（既存コードは触らない）
+import time, os
+START_TS = time.time()
+VERSION = os.getenv("VERSION", "0.0.0-dev")
+GIT_SHA = os.getenv("GIT_SHA", "0000000")
+
+@app.get("/metrics")
+def metrics():
+    lines = [
+        f'app_version_info{{version="{VERSION}",git_sha="{GIT_SHA}"}} 1',
+        f'app_uptime_seconds {int(time.time() - START_TS)}',
+        f'app_model_exists {1 if os.path.exists(MODEL_PATH) else 0}',
+        f'app_required_cols {len(_REQUIRED_COLS) or 0}',
+    ]
+    return FastAPI.responses.PlainTextResponse("\n".join(lines))
