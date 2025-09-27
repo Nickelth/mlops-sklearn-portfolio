@@ -4,7 +4,9 @@ __pycache__/
 *.pyc
 data/
 models/
-artifacts/
+!artifacts/
+artifacts/*
+!artifacts/perm_importance_openml_adult.png
 logs/
 /*.egg-info/
 /src/*.egg-info/

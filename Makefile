@@ -255,3 +255,24 @@ evidence:
 
 clean-tmp:
 >	rm -rf $(WORKDIR)
+
+.PHONY: evidence metrics svc-events tg-health
+
+metrics:
+>	@ALB_ARN=$$(aws elbv2 describe-target-groups --names mlops-api-tg \
+>	  --query 'TargetGroups[0].LoadBalancerArns[0]' -o text --region $(AWS_REGION)); \
+>	DNS=$$(aws elbv2 describe-load-balancers --load-balancer-arns $$ALB_ARN \
+>	  --query 'LoadBalancers[0].DNSName' -o text --region $(AWS_REGION)); \
+>	TS=$$(date +%Y%m%d_%H%M%S); \
+>	curl -s -i "http://$$DNS/metrics" | tee docs/evidence/$${TS}_metrics.txt
+
+tg-health:
+>	@TG_ARN=$$(aws elbv2 describe-target-groups --names mlops-api-tg \
+>	  --query 'TargetGroups[0].TargetGroupArn' -o text --region $(AWS_REGION)); \
+>	aws elbv2 describe-target-health --target-group-arn $$TG_ARN \
+>	  --query 'TargetHealthDescriptions[].{State:TargetHealth.State,Reason:TargetHealth.Reason,Port:Target.Port}' \
+>	  --output table --region $(AWS_REGION)
+
+svc-events:
+>	aws ecs describe-services --cluster mlops-api-cluster --services mlops-api-svc \
+>	  --query 'services[0].events[0:10]' --output table --region $(AWS_REGION)
