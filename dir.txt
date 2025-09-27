@@ -1,36 +1,83 @@
 .
+├── Dockerfile
 ├── Makefile
 ├── README.md
+├── README_legacy.md
 ├── api
+│   ├── __pycache__
+│   │   └── app.cpython-312.pyc
 │   └── app.py
-├── artifacts
-├── cache
-├── data
+├── data_cache
+│   └── openml
+│       └── openml.org
+│           └── api
+│               └── v1
+│                   └── json
 ├── dir.txt
-├── logs
-├── models
+├── docs
+│   ├── api.md
+│   ├── ci.md
+│   ├── docker.md
+│   ├── evidence
+│   │   ├── 2025-09-14_alb_dns.txt
+│   │   ├── 2025-09-14_health.txt
+│   │   ├── 2025-09-20-alb-curl.md
+│   │   ├── 2025-09-21_alb_dns.txt
+│   │   ├── 2025-09-21_health.txt
+│   │   ├── 20250922034834.log
+│   │   ├── 20250922_140945_alb_dns.txt
+│   │   ├── 20250922_140959_health.txt
+│   │   └── CHANGELOG.md
+│   ├── infra
+│   ├── ops.md
+│   ├── overview.md
+│   ├── result.md
+│   ├── severe_disaster_manual.md
+│   └── training.md
+├── infra
+│   ├── alb.tf
+│   ├── dev.tfvars
+│   ├── ecs.tf
+│   ├── iam.tf
+│   ├── log.tf
+│   ├── network.tf
+│   ├── outputs.tf
+│   ├── providers.tf
+│   ├── s3.tf
+│   ├── variables.tf
+│   └── versions.tf
 ├── notebooks
 │   └── 00_explore.ipynb
 ├── pyproject.toml
-└── src
-    ├── datasets.py
-    ├── features.py
-    ├── smoke.py
-    ├── train.py
-    └── utils.py
+├── scripts
+│   ├── generate_manifest.py
+│   └── log_report.py
+├── src
+│   ├── __pycache__
+│   │   ├── datasets.cpython-312.pyc
+│   │   └── train.cpython-312.pyc
+│   ├── datasets
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-312.pyc
+│   │   │   └── loader.cpython-312.pyc
+│   │   └── loader.py
+│   ├── mlops_sklearn_portfolio.egg-info
+│   │   ├── PKG-INFO
+│   │   ├── SOURCES.txt
+│   │   ├── dependency_links.txt
+│   │   ├── requires.txt
+│   │   └── top_level.txt
+│   ├── opt_threshold.py
+│   ├── perm_importance.py
+│   ├── smoke.py
+│   └── train.py
+└── tests
+    ├── __pycache__
+    │   ├── test_api_smoke.cpython-312-pytest-8.4.1.pyc
+    │   └── test_train.cpython-312-pytest-8.4.1.pyc
+    ├── test_api_smoke.py
+    ├── test_perm.py
+    └── test_train.py
 
-9 directories, 11 files
-
-.
-├─ api/                  # FastAPI（/health, /predict）
-├─ data/ 
-├─ src/                  # 学習スクリプト・ユーティリティ
-├─ notebooks/
-├─ models/               # joblib成果物
-├─ artifacts/            # summary.json, cv_results.csv, ほか
-├─ logs/                 # 学習ログ（latest.log はシンボリック）
-├─ cache/                # OpenMLキャッシュ（自動生成）
-├─ tests/                # 最小限のユニットテスト
-├─ Makefile
-├─ pyproject.toml
-└─ README.md
+22 directories, 59 files
