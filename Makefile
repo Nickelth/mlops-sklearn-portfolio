@@ -276,3 +276,17 @@ tg-health:
 svc-events:
 >	aws ecs describe-services --cluster mlops-api-cluster --services mlops-api-svc \
 >	  --query 'services[0].events[0:10]' --output table --region $(AWS_REGION)
+
+.PHONY: changelog changelog-range
+
+# 2つのコミット（or タグ）で比較して CHANGELOG を上書き
+# 使い方: make changelog FROM=<old> TO=<new>
+changelog:
+	@[ -n "$(FROM)" ] && [ -n "$(TO)" ] || (echo "FROM/TO を指定しろ"; exit 1)
+	python3 scripts/gen_changelog.py --from $(FROM) --to $(TO) --out docs/CHANGELOG.md
+
+# 日付範囲でまとめる（予定日→今日）
+# 使い方: make changelog-range SINCE=2025-09-14 UNTIL=2025-09-27
+changelog-range:
+	@[ -n "$(SINCE)" ] && [ -n "$(UNTIL)" ] || (echo "SINCE/UNTIL を指定"; exit 1)
+	python3 scripts/gen_changelog.py --since $(SINCE) --until $(UNTIL) --out docs/CHANGELOG.md
