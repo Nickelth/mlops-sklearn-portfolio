@@ -69,7 +69,14 @@ jobs:
         run: |
           pytest -q tests/test_api_smoke.py
           pytest -q tests/test_train.py -k test_train_builtin_fast
-          pytest -q tests/test_perm.py
+          MPLBACKEND=Agg python tests/test_perm.py --dataset=builtin --n-repeats=2 --max-samples=2000
+
+      - name: Upload permutation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perm-importance
+          path: artifacts/
 
   docker-build:
     runs-on: ubuntu-latest
