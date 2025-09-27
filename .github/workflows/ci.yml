@@ -69,7 +69,7 @@ jobs:
         run: |
           pytest -q tests/test_api_smoke.py
           pytest -q tests/test_train.py -k test_train_builtin_fast
-          MPLBACKEND=Agg python tests/test_perm.py --dataset=builtin --n-repeats=2 --max-samples=2000
+          MPLBACKEND=Agg python tests/test_perm.py --dataset=builtin --n-repeats=2 --max-samples=0.8
 
       - name: Upload permutation artifacts
         if: always()
