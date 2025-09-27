@@ -6,5 +6,7 @@ __pycache__/
 .cache/
 logs/
 artifacts/
-# ↓イメージにモデルを焼かない前提。焼くならコメントアウト
 models/
+data
+notebooks
+dir.txt
