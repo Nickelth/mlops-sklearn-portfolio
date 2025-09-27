@@ -75,7 +75,7 @@ resource "aws_ecs_service" "api" {
     container_port   = var.container_port
   }
 
-  health_check_grace_period_seconds = 30
+  health_check_grace_period_seconds = 60
   propagate_tags = "SERVICE"
 
   lifecycle {
@@ -88,6 +88,11 @@ resource "aws_ecs_service" "api" {
   ]
 
   tags = { Project = "mlops-sklearn-portfolio" }
+
+  deployment_circuit_breaker { 
+    enable = true
+    rollback = true 
+  }
 }
 
 # ========== Task Role（アプリ用の実行ロール） ==========
