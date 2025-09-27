@@ -59,7 +59,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dataset", required=True, choices=["builtin","adult","credit-g","local"])
     ap.add_argument("--n-repeats", type=int, default=8)
-    ap.add_argument("--max-samples", type=int, default=5000)
+    ap.add_argument("--max-samples", type=float, default=5000)
     args = ap.parse_args()
 
     pipe, X, y, dsname = ensure_model(args.dataset)
