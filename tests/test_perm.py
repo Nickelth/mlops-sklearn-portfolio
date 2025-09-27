@@ -69,6 +69,16 @@ def main():
 
     with threadpool_limits(1):
         base = float(roc_auc_score(yte, pipe.predict_proba(Xte)[:, 1]))
+        # sklearn は max_samples <= n_samples を要求するのでクリップする
+        n_samples = X.shape[0]
+        if args.max_samples is None:
+            eff_max = None
+        else:
+            # float の場合は割合として解釈される。>1.0 なら無効なので 1.0 に丸める
+            if isinstance(args.max_samples, float):
+                eff_max = min(1.0, args.max_samples)
+            else:
+                eff_max = min(int(args.max_samples), n_samples)
         r = permutation_importance(
             pipe, Xte, yte,
             n_repeats=args.n_repeats,
