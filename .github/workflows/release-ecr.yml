@@ -38,7 +38,7 @@ jobs:
           tags: |
             ${{ steps.ecr.outputs.registry }}/${{ vars.ECR_REPO }}:${{ github.ref_name }}
             ${{ steps.ecr.outputs.registry }}/${{ vars.ECR_REPO }}:latest
-            
+
       - name: Rollout on ECS (force new deployment)
         run: |
           set -euo pipefail
@@ -48,7 +48,7 @@ jobs:
             --cluster "${{ vars.ECS_CLUSTER }}" \
             --services "${{ vars.ECS_SERVICE }}" \
             --region "${{ vars.AWS_REGION }}" \
-            --query 'services[0].taskDefinition' -o text)
+            --query 'services[0].taskDefinition' --output text)
 
           # :latest を使う前提：force-new-deployment で新タスク起動時に最新イメージをpull
           aws ecs update-service \
