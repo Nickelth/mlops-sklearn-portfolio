@@ -1,7 +1,7 @@
 # api/app.py
 from fastapi import FastAPI, Query, HTTPException
 from pydantic import BaseModel
-import joblib, pandas as pd, os, time, threading, logging, json
+import joblib, pandas as pd, os, time, threading, logging, json, sys
 from datetime import datetime
 from typing import List, Set, Optional
 import boto3
@@ -27,6 +27,10 @@ if not _logger.handlers:
     fh = logging.FileHandler(LOG_FILE, encoding="utf-8")
     fh.setFormatter(logging.Formatter("%(message)s"))
     _logger.addHandler(fh)
+
+    sh = logging.StreamHandler(sys.stdout)
+    sh.setFormatter(logging.Formatter("%(message)s"))
+    _logger.addHandler(sh)
 
 def _json_log(**fields):
     # ensure_ascii=False で日本語もそのまま、1行JSON
