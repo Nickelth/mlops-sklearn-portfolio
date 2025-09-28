@@ -1,0 +1,625 @@
+{
+    "service": {
+        "serviceArn": "arn:aws:ecs:us-west-2:<ACCOUNT_ID>:service/mlops-api-cluster/mlops-api-svc",
+        "serviceName": "mlops-api-svc",
+        "clusterArn": "arn:aws:ecs:us-west-2:<ACCOUNT_ID>:cluster/mlops-api-cluster",
+        "loadBalancers": [
+            {
+                "targetGroupArn": "arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177",
+                "containerName": "api",
+                "containerPort": 8000
+            }
+        ],
+        "serviceRegistries": [],
+        "status": "ACTIVE",
+        "desiredCount": 1,
+        "runningCount": 1,
+        "pendingCount": 0,
+        "launchType": "FARGATE",
+        "platformVersion": "LATEST",
+        "platformFamily": "Linux",
+        "taskDefinition": "arn:aws:ecs:us-west-2:<ACCOUNT_ID>:task-definition/mlops-sklearn-portfolio-task:2",
+        "deploymentConfiguration": {
+            "deploymentCircuitBreaker": {
+                "enable": false,
+                "rollback": false
+            },
+            "maximumPercent": 200,
+            "minimumHealthyPercent": 100,
+            "strategy": "ROLLING",
+            "bakeTimeInMinutes": 0
+        },
+        "deployments": [
+            {
+                "id": "ecs-svc/1321572144193538327",
+                "status": "PRIMARY",
+                "taskDefinition": "arn:aws:ecs:us-west-2:<ACCOUNT_ID>:task-definition/mlops-sklearn-portfolio-task:2",
+                "desiredCount": 0,
+                "pendingCount": 0,
+                "runningCount": 0,
+                "failedTasks": 0,
+                "createdAt": "2025-09-28T02:03:46.697000+00:00",
+                "updatedAt": "2025-09-28T02:03:46.697000+00:00",
+                "launchType": "FARGATE",
+                "platformVersion": "1.4.0",
+                "platformFamily": "Linux",
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "<subnet-id>",
+                            "<subnet-id>",
+                            "<subnet-id>",
+                            "<subnet-id>"
+                        ],
+                        "securityGroups": [
+                            "<sg-id>"
+                        ],
+                        "assignPublicIp": "ENABLED"
+                    }
+                },
+                "rolloutState": "IN_PROGRESS",
+                "rolloutStateReason": "ECS deployment ecs-svc/1321572144193538327 in progress."
+            },
+            {
+                "id": "ecs-svc/6566086126359646727",
+                "status": "ACTIVE",
+                "taskDefinition": "arn:aws:ecs:us-west-2:<ACCOUNT_ID>:task-definition/mlops-sklearn-portfolio-task:2",
+                "desiredCount": 1,
+                "pendingCount": 0,
+                "runningCount": 1,
+                "failedTasks": 0,
+                "createdAt": "2025-09-28T01:55:44.183000+00:00",
+                "updatedAt": "2025-09-28T01:58:38.906000+00:00",
+                "launchType": "FARGATE",
+                "platformVersion": "1.4.0",
+                "platformFamily": "Linux",
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "<subnet-id>",
+                            "<subnet-id>",
+                            "<subnet-id>",
+                            "<subnet-id>"
+                        ],
+                        "securityGroups": [
+                            "<sg-id>"
+                        ],
+                        "assignPublicIp": "ENABLED"
+                    }
+                },
+                "rolloutState": "COMPLETED",
+                "rolloutStateReason": "ECS deployment ecs-svc/6566086126359646727 completed."
+            }
+        ],
+        "roleArn": "arn:aws:iam::<ACCOUNT_ID>:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+        "events": [
+            {
+                "id": "19e5029c-536f-4fc8-ace6-9729190fbe01",
+                "createdAt": "2025-09-28T01:58:38.913000+00:00",
+                "message": "(service mlops-api-svc) has reached a steady state."
+            },
+            {
+                "id": "f37a6746-c47c-4a2b-9bba-d3e0e6c6ec0d",
+                "createdAt": "2025-09-28T01:58:38.912000+00:00",
+                "message": "(service mlops-api-svc) (deployment ecs-svc/6566086126359646727) deployment completed."
+            },
+            {
+                "id": "5997ab06-232b-4422-9c72-13a3a8318404",
+                "createdAt": "2025-09-28T01:57:27.219000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/7001570363137802412) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "57324fa1-ebcb-45f3-a8e9-92663f508cfd",
+                "createdAt": "2025-09-28T01:57:27.215000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "e323854a-4e6b-4167-b36b-c6ec9e83677f",
+                "createdAt": "2025-09-28T01:57:17.628000+00:00",
+                "message": "(service mlops-api-svc) has stopped 1 running tasks: (task b8736f244a964a58935f26376a47abd9)."
+            },
+            {
+                "id": "0ebb5a8e-b942-49c8-b279-aa1b338d38fa",
+                "createdAt": "2025-09-28T01:56:27.915000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "68effe75-bd41-4e7f-93a0-3b050f6ab69d",
+                "createdAt": "2025-09-28T01:55:57.827000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 893e23605170419cb7185668641b2a7e)."
+            },
+            {
+                "id": "67aad9eb-cee5-4f2a-878b-e7da61a6279d",
+                "createdAt": "2025-09-28T01:49:22.234000+00:00",
+                "message": "(service mlops-api-svc) has reached a steady state."
+            },
+            {
+                "id": "b0969b60-c175-4bf4-802e-a6091a4d951c",
+                "createdAt": "2025-09-28T01:49:22.233000+00:00",
+                "message": "(service mlops-api-svc) (deployment ecs-svc/7001570363137802412) deployment completed."
+            },
+            {
+                "id": "fb3551a1-5190-47f1-ab41-97fa806dab68",
+                "createdAt": "2025-09-28T01:48:20.778000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/7870891182345082833) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "ba31a87c-32dd-4508-9fb8-d8e606c09e3c",
+                "createdAt": "2025-09-28T01:48:20.774000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "bc82cad4-7df4-41fe-bec1-c73ecd8a978d",
+                "createdAt": "2025-09-28T01:48:10.774000+00:00",
+                "message": "(service mlops-api-svc) has stopped 1 running tasks: (task b86a8ab1a2e644c19eeb0fc15c416907)."
+            },
+            {
+                "id": "f9f7fcef-8f1a-4e0a-b1b5-007c10a1e32d",
+                "createdAt": "2025-09-28T01:47:21.752000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "5cfeeaa6-cac3-43f6-a008-750beeb535e5",
+                "createdAt": "2025-09-28T01:46:41.786000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task b8736f244a964a58935f26376a47abd9)."
+            },
+            {
+                "id": "db4d8029-1ace-45bc-ab09-9b02627c7607",
+                "createdAt": "2025-09-27T23:14:05.311000+00:00",
+                "message": "(service mlops-api-svc) has reached a steady state."
+            },
+            {
+                "id": "fe39553c-3d0e-4c7e-8b54-fde25b867f1b",
+                "createdAt": "2025-09-27T17:14:04.128000+00:00",
+                "message": "(service mlops-api-svc) has reached a steady state."
+            },
+            {
+                "id": "7e55b53d-91fa-47cd-aad3-8c9323ce8d61",
+                "createdAt": "2025-09-27T11:13:38.723000+00:00",
+                "message": "(service mlops-api-svc) has reached a steady state."
+            },
+            {
+                "id": "e07a3086-c165-4446-a956-f3d71b170bc8",
+                "createdAt": "2025-09-27T05:13:28.001000+00:00",
+                "message": "(service mlops-api-svc) has reached a steady state."
+            },
+            {
+                "id": "485af819-7bce-4917-8489-19a650841d13",
+                "createdAt": "2025-09-27T05:13:28+00:00",
+                "message": "(service mlops-api-svc) (deployment ecs-svc/7870891182345082833) deployment completed."
+            },
+            {
+                "id": "da52a5b0-eb19-495f-adab-21040d0794fc",
+                "createdAt": "2025-09-27T05:12:48.219000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "d281b693-1f3f-49a9-87f9-dc26cb225d13",
+                "createdAt": "2025-09-27T05:12:19.305000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task b86a8ab1a2e644c19eeb0fc15c416907)."
+            },
+            {
+                "id": "6ea77587-e195-46cd-b8ae-247a5753061c",
+                "createdAt": "2025-09-27T05:08:31.236000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "0d93c909-75a9-4ac6-9cc0-2f18a1fd6b7e",
+                "createdAt": "2025-09-27T05:08:31.232000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "03a9fcf5-f462-419a-873d-f68b40ab8108",
+                "createdAt": "2025-09-27T05:08:12.656000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "262d1f52-5f95-4e11-acd9-87df0c10cbe0",
+                "createdAt": "2025-09-27T05:07:44.083000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 2e4fe07181fe4184b67538da81e17519)."
+            },
+            {
+                "id": "e9d5070d-743f-48c4-9f61-3dd6714aa88c",
+                "createdAt": "2025-09-27T05:06:53.504000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "240b027b-b5d9-467c-9f2d-40a183d5507d",
+                "createdAt": "2025-09-27T05:06:53.499000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "ede8f044-4d2a-4cea-9002-f2601943b76e",
+                "createdAt": "2025-09-27T05:06:34.998000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "692ff0e6-8599-418d-bafd-efedfe39ca6c",
+                "createdAt": "2025-09-27T05:06:05.757000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task d45ba01950524331bf1a85127e5f2ba6)."
+            },
+            {
+                "id": "1a05ced3-ec0f-41c7-8834-19d23e877c85",
+                "createdAt": "2025-09-27T05:02:28.032000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "5dc193e4-7d40-4c37-b384-146964e8c7f8",
+                "createdAt": "2025-09-27T05:02:28.028000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "39e2d95e-1351-4776-837f-80514fef05fe",
+                "createdAt": "2025-09-27T05:01:58.702000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "520d1ea2-d4a9-4e3a-92cd-c04748aaf202",
+                "createdAt": "2025-09-27T05:01:29.600000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 19dc6a9d252545db96b6567f3f402230)."
+            },
+            {
+                "id": "8ef00d6a-378a-48e5-a885-31123f002d74",
+                "createdAt": "2025-09-27T05:00:48.470000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "0d531657-6915-4475-8185-c0f5a6f190f8",
+                "createdAt": "2025-09-27T05:00:48.466000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "25fdb003-81fd-43b2-a91c-cf030c24742f",
+                "createdAt": "2025-09-27T05:00:28.310000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "546189df-ca42-4e2f-b299-1fa1ac9bd056",
+                "createdAt": "2025-09-27T05:00:00.083000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 826d7cc513f548c8944e1e4b33eacca4)."
+            },
+            {
+                "id": "756f6316-b346-4705-95f9-5700b6435d36",
+                "createdAt": "2025-09-27T04:56:18.310000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "d87fc14e-5ded-439d-b200-75b6565ba500",
+                "createdAt": "2025-09-27T04:56:18.172000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "2e7f509f-71c2-4963-8704-33a897331e40",
+                "createdAt": "2025-09-27T04:56:18.168000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "75105734-4ddf-4da5-8e60-dd11bf321b88",
+                "createdAt": "2025-09-27T04:55:38.040000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "1d8d9543-4f77-40f5-8465-1e73e47af7b8",
+                "createdAt": "2025-09-27T04:54:58.256000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task f1948f68142e40cdb02ac0809d88eef1)."
+            },
+            {
+                "id": "f1e488af-bab4-4e21-aab7-4cbab4a0c53d",
+                "createdAt": "2025-09-27T04:54:47.051000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "c0f51e19-f020-445e-9f2d-5dca336ec9c5",
+                "createdAt": "2025-09-27T04:54:47.046000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "9a77358d-26ef-45ba-8d53-c9fab2d36a2c",
+                "createdAt": "2025-09-27T04:54:27.892000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "464ec08c-77b9-429c-9122-92ce55c2288e",
+                "createdAt": "2025-09-27T04:53:59.213000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task aeaf697197c54ac4ba4b2ee62613b10f)."
+            },
+            {
+                "id": "eba2a81d-b614-4cc7-a653-b73e1356c98c",
+                "createdAt": "2025-09-27T04:49:44.014000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "a34871b9-947b-47cc-bb23-509920d5d02c",
+                "createdAt": "2025-09-27T04:49:44.010000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "a971014b-2c5f-4bc9-981d-d6e842900b05",
+                "createdAt": "2025-09-27T04:49:25.829000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "d7f4a0ab-0070-4cd5-8e53-90e326894b8c",
+                "createdAt": "2025-09-27T04:48:56.872000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 966aedad78c145938535e947c9be9cd3)."
+            },
+            {
+                "id": "f070d32a-62f4-498e-b7ee-ff8c5a7415d8",
+                "createdAt": "2025-09-27T04:48:46.744000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "8342c8bd-d56e-422e-b937-f67c6a177421",
+                "createdAt": "2025-09-27T04:48:46.620000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "fdc13b9d-0572-44cc-a6d0-eb82950ba784",
+                "createdAt": "2025-09-27T04:48:46.615000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "c707f244-d7fb-42e0-b546-8b8c6259db21",
+                "createdAt": "2025-09-27T04:48:07.943000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "7d3bd341-501d-4c1f-82f7-341261c3b8b9",
+                "createdAt": "2025-09-27T04:47:29.704000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 9e141b045d734360b1dc418adcc05172)."
+            },
+            {
+                "id": "3eb220e9-fc0f-42ec-b382-7278300a005e",
+                "createdAt": "2025-09-27T04:43:13.602000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "bd407a7a-d892-4b8e-8cfe-8b8d1db19080",
+                "createdAt": "2025-09-27T04:43:13.597000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "77839aa5-1f5b-4455-8479-ae306e52b518",
+                "createdAt": "2025-09-27T04:42:55.230000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "49bb94ce-b518-4570-a6f9-26033a7c1880",
+                "createdAt": "2025-09-27T04:42:25.782000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 9b917730056e4267895e904904fddf17)."
+            },
+            {
+                "id": "7e6af3bf-8228-4957-80bb-1044b2e1cac9",
+                "createdAt": "2025-09-27T04:42:15.899000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "d4087b35-f142-49e2-ab01-45b112a4b572",
+                "createdAt": "2025-09-27T04:42:15.894000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "c699dfa1-16de-4aa7-935c-d0d25a27ca76",
+                "createdAt": "2025-09-27T04:42:06.868000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "18569cf9-daf3-47b2-9bc0-7f50f4fd0591",
+                "createdAt": "2025-09-27T04:41:29.109000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 8fda8587ac5a4c70ba7d7af12f2fa297)."
+            },
+            {
+                "id": "5d3c9026-35fc-421b-90de-aa99d9f023ea",
+                "createdAt": "2025-09-27T04:37:09.301000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "a69384c3-f8e3-4f66-b3cf-15c01c2ad50a",
+                "createdAt": "2025-09-27T04:37:09.297000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "ea1f032e-caeb-4ce2-a774-9a2925b05e9f",
+                "createdAt": "2025-09-27T04:36:50.733000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "cdd1e8b9-b099-42cc-9af1-f5df77b1114c",
+                "createdAt": "2025-09-27T04:36:22.388000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 58592009b9434bc88d0366654ad9a1f2)."
+            },
+            {
+                "id": "f9044708-f5f4-43f8-8c48-43e3b1d5f236",
+                "createdAt": "2025-09-27T04:36:12.688000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "364070ae-15f2-43a3-a083-887a8c427a60",
+                "createdAt": "2025-09-27T04:36:12.683000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "71e4310b-ec9c-4da8-b031-80e6dad2fc6f",
+                "createdAt": "2025-09-27T04:35:54.282000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "226f3bdd-b65e-44ce-9360-eba33d32bb90",
+                "createdAt": "2025-09-27T04:35:25.991000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 4e511eba43074d5c876de57a739b9fd6)."
+            },
+            {
+                "id": "871f394e-701d-4111-b166-890b01180c62",
+                "createdAt": "2025-09-27T04:31:10.556000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "8cc326d8-2a97-4c21-a464-6f14fec1a0aa",
+                "createdAt": "2025-09-27T04:31:10.552000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "604fee44-5e36-4512-a07f-2a4bdf698e00",
+                "createdAt": "2025-09-27T04:30:52.206000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "108d2bbd-95cc-425a-a7c0-29634f9a3e01",
+                "createdAt": "2025-09-27T04:30:23.778000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task de7a0a6d2a7e4892939eebf0424734ce)."
+            },
+            {
+                "id": "7907180f-100e-449a-b9d0-475a4fce434c",
+                "createdAt": "2025-09-27T04:30:13.033000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "875730d1-106a-4bf5-9e2d-ac6f48e8a022",
+                "createdAt": "2025-09-27T04:30:13.029000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "c5e03868-ff73-470d-894b-f4532930484c",
+                "createdAt": "2025-09-27T04:29:54.660000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "23ebb9e1-97b9-4032-9938-2c59eb00ade7",
+                "createdAt": "2025-09-27T04:29:24.783000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 64b2947055344369bba337a4a5e5680c)."
+            },
+            {
+                "id": "abc90ee4-bfc2-434b-8835-377267ca4415",
+                "createdAt": "2025-09-27T04:25:08.099000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "75ad300f-6a4b-4361-bda7-4f6c0d4c85e4",
+                "createdAt": "2025-09-27T04:25:08.095000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "401385a2-e3c3-4f50-9bfc-e72647a7f820",
+                "createdAt": "2025-09-27T04:24:48.241000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "6a80b858-fdf5-448f-b49f-bc63e7145bd4",
+                "createdAt": "2025-09-27T04:24:19.527000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 0ed6446f009c4e5ab85a4655441c0788)."
+            },
+            {
+                "id": "42da81ce-deb4-4ab7-915d-79bc8359d0df",
+                "createdAt": "2025-09-27T04:24:08.592000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "f1e6fdcc-1bf5-4096-ba4f-9addffbd33d1",
+                "createdAt": "2025-09-27T04:24:08.588000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "9a080ef9-fdb9-491f-8abe-b2b0c92f71fc",
+                "createdAt": "2025-09-27T04:23:49.988000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "cd9f481d-4b12-426b-a7ba-85aae8822b76",
+                "createdAt": "2025-09-27T04:23:21.374000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 999e27fce0204d18a41a5bfa8ef85643)."
+            },
+            {
+                "id": "17bab59c-7da9-4b85-a3af-5d0afad90cb0",
+                "createdAt": "2025-09-27T04:19:00.401000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "bc621aa3-4c3f-4a38-b98b-66db991c3430",
+                "createdAt": "2025-09-27T04:19:00.397000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "fae1e886-ef3e-4367-b6b3-68dff3cd13b1",
+                "createdAt": "2025-09-27T04:18:42.764000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "368956a9-08c6-4a9e-8d2d-1e48cb9db295",
+                "createdAt": "2025-09-27T04:18:13.876000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 1d3149c2c4f54c5d9c7fd60d41653b5b)."
+            },
+            {
+                "id": "88beee19-be68-4e1e-a7dd-d08e426d78cc",
+                "createdAt": "2025-09-27T04:18:03.351000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "4353dde5-1753-4d03-b4ec-2cdad3deb09b",
+                "createdAt": "2025-09-27T04:18:03.347000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "7d653da2-aaca-4e37-b2e8-773a3a629787",
+                "createdAt": "2025-09-27T04:17:43.635000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "e0e54fca-d3ab-46ec-9343-4e575798bde3",
+                "createdAt": "2025-09-27T04:17:15.249000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 89cc181c25c944afb5fd6cccbb24d20c)."
+            },
+            {
+                "id": "a94cac28-9cc6-4f66-af93-f352c2df2ac5",
+                "createdAt": "2025-09-27T04:12:59.485000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "9826c01f-46e2-4819-b31e-b831064d27ce",
+                "createdAt": "2025-09-27T04:12:59.481000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "f33e4567-7882-4abe-b696-46d6b3af1d8a",
+                "createdAt": "2025-09-27T04:12:40.366000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177)"
+            },
+            {
+                "id": "0dc6611d-6363-4c5a-b852-b66d4bb37f79",
+                "createdAt": "2025-09-27T04:12:11.986000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 940caf8e6f614173b1ceb68459ebfc49)."
+            },
+            {
+                "id": "99fdde1c-8a5d-4441-9a3a-6ecf395b63f8",
+                "createdAt": "2025-09-27T04:12:01.795000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/0716107977245313588) has begun draining connections on 1 tasks."
+            }
+        ],
+        "createdAt": "2025-09-21T07:32:21.054000+00:00",
+        "placementConstraints": [],
+        "placementStrategy": [],
+        "networkConfiguration": {
+            "awsvpcConfiguration": {
+                "subnets": [
+                    "<subnet-id>",
+                    "<subnet-id>",
+                    "<subnet-id>",
+                    "<subnet-id>"
+                ],
+                "securityGroups": [
+                    "<sg-id>"
+                ],
+                "assignPublicIp": "ENABLED"
+            }
+        },
+        "healthCheckGracePeriodSeconds": 30,
+        "schedulingStrategy": "REPLICA",
+        "deploymentController": {
+            "type": "ECS"
+        },
+        "createdBy": "arn:aws:iam::<ACCOUNT_ID>:root",
+        "enableECSManagedTags": false,
+        "propagateTags": "SERVICE",
+        "enableExecuteCommand": false,
+        "availabilityZoneRebalancing": "DISABLED"
+    }
+}
