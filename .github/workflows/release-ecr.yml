@@ -38,3 +38,48 @@ jobs:
           tags: |
             ${{ steps.ecr.outputs.registry }}/${{ vars.ECR_REPO }}:${{ github.ref_name }}
             ${{ steps.ecr.outputs.registry }}/${{ vars.ECR_REPO }}:latest
+            
+      - name: Rollout on ECS (force new deployment)
+        run: |
+          set -euo pipefail
+
+          # 直前（更新前）の TaskDef を取得しておく（ロールバック用）
+          PREV_TD_ARN=$(aws ecs describe-services \
+            --cluster "${{ vars.ECS_CLUSTER }}" \
+            --services "${{ vars.ECS_SERVICE }}" \
+            --region "${{ vars.AWS_REGION }}" \
+            --query 'services[0].taskDefinition' -o text)
+
+          # :latest を使う前提：force-new-deployment で新タスク起動時に最新イメージをpull
+          aws ecs update-service \
+            --cluster "${{ vars.ECS_CLUSTER }}" \
+            --service "${{ vars.ECS_SERVICE }}" \
+            --force-new-deployment \
+            --region "${{ vars.AWS_REGION }}" > /tmp/update.json
+
+          NEW_TD_ARN=$(jq -r '.service.taskDefinition' /tmp/update.json)
+
+          # デプロイ記録（deploy_history.json）を作ってアーティファクト保存
+          TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          REGISTRY="${{ steps.ecr.outputs.registry }}"
+          IMAGE_TAG="${{ github.ref_name }}"   # 例: v2025-09-28
+          cat > artifacts/deploy_history.json <<EOF
+          {
+            "timestamp":"$TS",
+            "git_sha":"${{ github.sha }}",
+            "image_uri_tag":"$REGISTRY/${{ vars.ECR_REPO }}:$IMAGE_TAG",
+            "image_uri_latest":"$REGISTRY/${{ vars.ECR_REPO }}:latest",
+            "cluster":"${{ vars.ECS_CLUSTER }}",
+            "service":"${{ vars.ECS_SERVICE }}",
+            "taskdef_prev":"$PREV_TD_ARN",
+            "taskdef_new":"$NEW_TD_ARN"
+          }
+          EOF
+        shell: bash
+
+      - name: Upload deploy_history.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-history
+          path: artifacts/deploy_history.json
+

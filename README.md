@@ -31,7 +31,7 @@ curl -s localhost:8000/health
 * CI: [docs/ci.md](docs/ci.md)
 * 運用・S3同期・ログ: [docs/ops.md](docs/ops.md)
 * 激甚時撤収: [severe\_disaster\_manual.md](docs/severe_disaster_manual.md)
-* 変更履歴: [CHANGELOG.md](docs/evidence/CHANGELOG.md)
+* 変更履歴: [CHANGELOG.md](docs/CHANGELOG.md)
 
 ### ディレクトリ
 
@@ -45,24 +45,37 @@ api/  src/  models/  artifacts/  logs/  tests/  docs/
 
 ### 完成定義
 
-[ ] **ALB 経由 /healthz が常時 200**（ターゲットグループ Healthy） 
-[ ] **手動デプロイが再現可能**（新 TaskDef 登録 → force-new-deployment → 直前リビジョンへロールバックできる） 
-[ ] **観測の入口**として CloudWatch Logs に構造化ログが出ている（JSON1行） 
-[ ] **IaC は“薄切り”**（VPC/ALB/TG/ECS/ECR の最小一式を Terraform で再現可能。Import 完全一致は捨てる） 
-[ ] **evidenceフォルダ配下**：curl結果、ALB/TGヘルスSS、ECSイベント抜粋、terraform plan 抜粋 
-[ ] 「手動デプロイ再現可能」に**失敗からのロールバック実演**を明記。
-[ ] **観測はアラームを最低1個具体化**（例: 5xx率、TargetResponseTime、タスク異常終了）。 
-[ ] **CLI履歴の証跡化**: scriptコマンドかbash -xログ、加えてCloudTrail + Configを記事に添える
+- [ ] **ALB 経由 /healthz が常時 200**（ターゲットグループ Healthy） 
+
+- [ ] **手動デプロイが再現可能**（新 TaskDef 登録 → force-new-deployment → 直前リビジョンへロールバックできる） 
+
+- [ ] **観測の入口**として CloudWatch Logs に構造化ログが出ている（JSON1行） 
+
+- [ ] **IaC は“薄切り”**（VPC/ALB/TG/ECS/ECR の最小一式を Terraform で再現可能。Import 完全一致は捨てる） 
+
+- [ ] **evidenceフォルダ配下**：curl結果、ALB/TGヘルスSS、ECSイベント抜粋、terraform plan 抜粋 
+
+- [ ] 「手動デプロイ再現可能」に**失敗からのロールバック実演**を明記。
+
+- [ ] **観測はアラームを最低1個具体化**（例: 5xx率、TargetResponseTime、タスク異常終了）。 
+
+- [ ] **CLI履歴の証跡化**: scriptコマンドかbash -xログ、加えてCloudTrail + Configを記事に添える
 
 ### 証跡チェックリスト
 
-[ ] ALB/TG: ヘルス一覧SS、curl -I https://{alb}/healthz、ターゲット登録変遷のイベント抜粋
-[ ] ECS: 新旧TaskDef ARN、force-new-deployment 実行ログ、ロールバックの実演記録
-[ ] CloudWatch Logs: 1行JSON例、@timestamp、level, requestId, path, latency_ms, status
-[ ] CloudWatch Metrics/Alarm: 3件以上、しきい値と期間、誤検知のメモ
-[ ] IaC: terraform plan 抜粋、State分離の方針メモ、命名規約1ページ
-[ ] 負荷試験: k6スクリプト、summary.json、p90/RPS/エラー率、ALBアクセスログ抜粋
-[ ] 監査系: CloudTrailとConfigのクエリ内容とエビデンスのパス
+- [ ] ALB/TG: ヘルス一覧SS、curl -I https://{alb}/healthz、ターゲット登録変遷のイベント抜粋
+
+- [ ] ECS: 新旧TaskDef ARN、force-new-deployment 実行ログ、ロールバックの実演記録
+
+- [ ] CloudWatch Logs: 1行JSON例、@timestamp、level, requestId, path, latency_ms, status
+
+- [ ] CloudWatch Metrics/Alarm: 3件以上、しきい値と期間、誤検知のメモ
+
+- [ ] IaC: terraform plan 抜粋、State分離の方針メモ、命名規約1ページ
+
+- [ ] 負荷試験: k6スクリプト、summary.json、p90/RPS/エラー率、ALBアクセスログ抜粋
+
+- [ ] 監査系: CloudTrailとConfigのクエリ内容とエビデンスのパス
 
 ### 閾値最適化（PR曲線×F1最大）(2025-09-09)
 
