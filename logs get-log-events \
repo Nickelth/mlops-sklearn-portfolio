@@ -1,0 +1,35 @@
+{
+    "logStreams": [
+        {
+            "logStreamName": "api/api/ef1b1ccb20a94581b1e765ef2f00b2b6",
+            "creationTime": 1758941909536,
+            "firstEventTimestamp": 1758941926590,
+            "lastEventTimestamp": 1758941926598,
+            "lastIngestionTime": 1758941930064,
+            "uploadSequenceToken": "49039859645743299868489487368453546477253435638900352925",
+            "arn": "arn:aws:logs:us-west-2:438336773404:log-group:/mlops/api:log-stream:api/api/ef1b1ccb20a94581b1e765ef2f00b2b6",
+            "storedBytes": 0
+        },
+        {
+            "logStreamName": "api/api/b1b210bfa5ee47aba1a03a2c8b060bd7",
+            "creationTime": 1758941600515,
+            "firstEventTimestamp": 1758941620550,
+            "lastEventTimestamp": 1758941620555,
+            "lastIngestionTime": 1758941623399,
+            "uploadSequenceToken": "49039859645742892240786159987227383751860820700136236969",
+            "arn": "arn:aws:logs:us-west-2:438336773404:log-group:/mlops/api:log-stream:api/api/b1b210bfa5ee47aba1a03a2c8b060bd7",
+            "storedBytes": 0
+        },
+        {
+            "logStreamName": "api/api/6e7d99a7200b4c48bd27eaa5aa9c1901",
+            "creationTime": 1758941516489,
+            "firstEventTimestamp": 1758941534489,
+            "lastEventTimestamp": 1758941534495,
+            "lastIngestionTime": 1758941537914,
+            "uploadSequenceToken": "49039859645742778611730940313693989210506283632059508657",
+            "arn": "arn:aws:logs:us-west-2:438336773404:log-group:/mlops/api:log-stream:api/api/6e7d99a7200b4c48bd27eaa5aa9c1901",
+            "storedBytes": 0
+        }
+    ],
+    "nextToken": "Kwfr0bfVKkYk4OrYazFRiTi_VhGj_2_ZIJXtvKNEux-InD_2hE-G5dR_3AXfn03SvSJQRVBjhjPyLIDu5Y_OmZyhDDwKa0KUbpcjJPMv9QN4qozz-jMwXQpM3xaPvl9mH3Z1n4IcXgoKkDWPSLVjvPIgkpMbr2RxdzNzl5lrtNq5Z73gMmeDOTODvKUlEBufSI28eFnQXSLqT2QzRPXPyEqXHwgFbNkNrdQH7sSUQzwh6clnjRIXAByYQA6zzhgJLmzgzmWgREOz2DRXcMvYnaG2O6Psr0LfPhfzuKhJKtMCsNiFmLE-tHbcnhWiDpLl6zFa8OClVDK8D3lI4h7F6bkZKQ5aOgK2ZROzP2Exl9y4lEJlAzcQg0hjR9MK4BCLhb5ne2-NJq8u_lpRdU2EA3zs_6khKEfyLcgcO1jXn08"
+}

@@ -1,0 +1,91 @@
+{
+    "events": [
+        {
+            "timestamp": 1759025072696,
+            "message": "INFO:     Started server process [1]",
+            "ingestionTime": 1759025075536
+        },
+        {
+            "timestamp": 1759025072696,
+            "message": "INFO:     Waiting for application startup.",
+            "ingestionTime": 1759025075536
+        },
+        {
+            "timestamp": 1759025077389,
+            "message": "{\"ts\": 1759025077.3890908, \"event\": \"startup\", \"model\": \"model_openml_adult.joblib\", \"exists\": true}",
+            "ingestionTime": 1759025080476
+        },
+        {
+            "timestamp": 1759025077389,
+            "message": "INFO:     Application startup complete.",
+            "ingestionTime": 1759025080476
+        },
+        {
+            "timestamp": 1759025077457,
+            "message": "INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)",
+            "ingestionTime": 1759025080476
+        },
+        {
+            "timestamp": 1759025082373,
+            "message": "{\"ts\": 1759025082.3729374, \"method\": \"GET\", \"path\": \"/health\", \"query\": \"\", \"status\": 200, \"latency_ms\": 1, \"client\": \"172.31.19.167\", \"ua\": \"ELB-HealthChecker/2.0\", \"model\": \"model_openml_adult.joblib\"}",
+            "ingestionTime": 1759025085471
+        },
+        {
+            "timestamp": 1759025082373,
+            "message": "INFO:     172.31.19.167:32154 - \"GET /health HTTP/1.1\" 200 OK",
+            "ingestionTime": 1759025085471
+        },
+        {
+            "timestamp": 1759025082433,
+            "message": "{\"ts\": 1759025082.433646, \"method\": \"GET\", \"path\": \"/health\", \"query\": \"\", \"status\": 200, \"latency_ms\": 0, \"client\": \"172.31.32.141\", \"ua\": \"ELB-HealthChecker/2.0\", \"model\": \"model_openml_adult.joblib\"}",
+            "ingestionTime": 1759025085471
+        },
+        {
+            "timestamp": 1759025082433,
+            "message": "INFO:     172.31.32.141:6770 - \"GET /health HTTP/1.1\" 200 OK",
+            "ingestionTime": 1759025085471
+        },
+        {
+            "timestamp": 1759025082449,
+            "message": "{\"ts\": 1759025082.449655, \"method\": \"GET\", \"path\": \"/health\", \"query\": \"\", \"status\": 200, \"latency_ms\": 0, \"client\": \"172.31.11.4\", \"ua\": \"ELB-HealthChecker/2.0\", \"model\": \"model_openml_adult.joblib\"}",
+            "ingestionTime": 1759025085471
+        },
+        {
+            "timestamp": 1759025082449,
+            "message": "INFO:     172.31.11.4:3812 - \"GET /health HTTP/1.1\" 200 OK",
+            "ingestionTime": 1759025085471
+        },
+        {
+            "timestamp": 1759025092369,
+            "message": "{\"ts\": 1759025092.3694866, \"method\": \"GET\", \"path\": \"/health\", \"query\": \"\", \"status\": 200, \"latency_ms\": 0, \"client\": \"172.31.19.167\", \"ua\": \"ELB-HealthChecker/2.0\", \"model\": \"model_openml_adult.joblib\"}",
+            "ingestionTime": 1759025095486
+        },
+        {
+            "timestamp": 1759025092369,
+            "message": "INFO:     172.31.19.167:30098 - \"GET /health HTTP/1.1\" 200 OK",
+            "ingestionTime": 1759025095486
+        },
+        {
+            "timestamp": 1759025092438,
+            "message": "{\"ts\": 1759025092.4381132, \"method\": \"GET\", \"path\": \"/health\", \"query\": \"\", \"status\": 200, \"latency_ms\": 0, \"client\": \"172.31.32.141\", \"ua\": \"ELB-HealthChecker/2.0\", \"model\": \"model_openml_adult.joblib\"}",
+            "ingestionTime": 1759025095486
+        },
+        {
+            "timestamp": 1759025092438,
+            "message": "INFO:     172.31.32.141:53954 - \"GET /health HTTP/1.1\" 200 OK",
+            "ingestionTime": 1759025095486
+        },
+        {
+            "timestamp": 1759025092455,
+            "message": "{\"ts\": 1759025092.4555187, \"method\": \"GET\", \"path\": \"/health\", \"query\": \"\", \"status\": 200, \"latency_ms\": 1, \"client\": \"172.31.11.4\", \"ua\": \"ELB-HealthChecker/2.0\", \"model\": \"model_openml_adult.joblib\"}",
+            "ingestionTime": 1759025095486
+        },
+        {
+            "timestamp": 1759025092455,
+            "message": "INFO:     172.31.11.4:21880 - \"GET /health HTTP/1.1\" 200 OK",
+            "ingestionTime": 1759025095486
+        }
+    ],
+    "nextForwardToken": "f/39227570384660726703815160240513633200524042856163115013/s",
+    "nextBackwardToken": "b/39227569944020302326048577562790939270558910695136821248/s"
+}
