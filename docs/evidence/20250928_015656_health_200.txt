@@ -1,0 +1,8 @@
+HTTP/1.1 200 OK
+Date: Sun, 28 Sep 2025 01:56:56 GMT
+Content-Type: application/json
+Content-Length: 105
+Connection: keep-alive
+server: uvicorn
+
+{"status":"ok","model":"model_openml_adult.joblib","ts":1759024616.4762487,"cols":14,"model_exists":true}
