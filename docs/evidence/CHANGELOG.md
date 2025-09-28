@@ -1,6 +1,70 @@
 # Changelog
 
-````markdown
+## (2025-09-28)
+
+目的:
+- エンドポイント名の不一致解消(`health`に統一)
+- ログの出力先: JSON 1行を stdout→CloudWatchへ
+- 証跡: curl /healthz 成功、TG Healthy スクショ、ECS イベント抜粋
+
+### 主要変更
+
+### 証跡
+
+### ロールアウト
+
+### リスクと対策
+
+### 次アクション
+
+---
+
+## ECS無停止デプロイ（2025-09-14 → 2025-09-27）
+
+目的: Fargate/ECS を ALB 配下で無停止更新。証跡で可観測・再現可能に。
+
+### 主要変更
+
+* Infra（ecs.tf）
+
+  * deployment_circuit_breaker=on, health_check_grace_period_seconds=60
+  * task_role_arn 追加 + s3:GetObject 付与（MODEL_S3_URI）
+* API（api/app.py）
+
+  * 起動時のモデルロードを「可能なら」に緩和、S3フェッチ、/metrics 追加
+* Config（pyproject.toml）
+
+  * boto3 追加、sklearn バージョン整合（警告解消）
+* Makefile
+
+  * /tmp で Terraform 実行、tg-health / svc-events / metrics 追加
+
+### 証跡
+
+* ALB DNS: `<ALB_DNS>`
+* `/health` 200: `docs/evidence/20250927_054140_health.txt`
+* Target Health: healthy（`make tg-health` 出力）
+* CloudWatch Logs: Uvicorn 起動ログ + /health アクセス記録
+
+### ロールアウト
+
+1. GH Actions で `:latest` push
+2. `aws ecs update-service --force-new-deployment`
+3. `make tg-health` が healthy になったら `make evidence && make metrics`
+
+### リスクと対策
+
+* モデル未配置: /predict 初回 503、/reload or 先読み実行で回避
+* 依存差異: sklearn pin、Artifacts にメタ付与
+* ロールバック: Circuit breaker + 旧TaskDefinitionへの手動戻し
+
+### 次アクション
+
+* `/metrics` をダッシュボード集約
+* モデル配布に署名/ハッシュ検証
+
+---
+
 ## 2025-09-13
 
 ### 作業
@@ -15,8 +79,8 @@
 
 ### 影響・備考
 - IaC 着手のための環境準備のみ。インフラ定義（`infra/` 以下）や `terraform init/plan` は次回作業で実施。
-````
 
+---
 
 ## 2025-09-09
 
@@ -39,6 +103,8 @@
 
 - 軽いスモーク: `tests/test_threshold.py`（実行→JSONのキー存在だけ検証）。
 - `venv/bin/pytest -q tests/test_threshold.py`
+
+---
 
 ## 2025-09-07
 
@@ -88,6 +154,7 @@
 
 **Breaking Changes:** なし
 
+---
 
 ## 2025-09-06
 - 学習サマリに git_commit/python/sklearn/pandas を記録
