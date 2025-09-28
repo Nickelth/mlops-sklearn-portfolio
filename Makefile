@@ -284,11 +284,11 @@ svc-events:
 changelog:
 > TS=$$(date +%Y-%m-%d); \
 >	@[ -n "$(FROM)" ] && [ -n "$(TO)" ] || (echo "FROM/TO がありません"; exit 1)
->	python3 scripts/gen_changelog.py --from $(FROM) --to $(TO) --out docs/evidence/CHANGELOG_$$TS.md
+>	python3 scripts/gen_changelog.py --from $(FROM) --to $(TO) --out docs/CHANGELOG_$$TS.md
 
 # 日付範囲でまとめる（予定日→今日）
 # 使い方: make changelog-range SINCE=2025-09-14 UNTIL=2025-09-27
 changelog-range:
 > TS=$$(date +%Y-%m-%d); \
 >	@[ -n "$(SINCE)" ] && [ -n "$(UNTIL)" ] || (echo "SINCE/UNTIL がありません"; exit 1)
->	python3 scripts/gen_changelog.py --since $(SINCE) --until $(UNTIL) --out docs/evidence/CHANGELOG_$$TS.md
+>	python3 scripts/gen_changelog.py --since $(SINCE) --until $(UNTIL) --out docs/CHANGELOG_$$TS.md
