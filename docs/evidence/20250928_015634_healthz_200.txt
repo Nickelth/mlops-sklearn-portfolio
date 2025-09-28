@@ -1,0 +1,8 @@
+HTTP/1.1 404 Not Found
+Date: Sun, 28 Sep 2025 01:56:34 GMT
+Content-Type: application/json
+Content-Length: 22
+Connection: keep-alive
+server: uvicorn
+
+{"detail":"Not Found"}
