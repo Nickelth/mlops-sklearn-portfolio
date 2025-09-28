@@ -95,6 +95,15 @@ def _normalize_batch(rows: List[dict]) -> pd.DataFrame:
             df[col] = pd.to_numeric(df[col], errors="coerce")
     return df
 
+def _health_payload():
+    return {
+        "status": "ok",
+        "model": os.path.basename(MODEL_PATH),
+        "ts": time.time(),
+        "cols": len(_REQUIRED_COLS) or None,
+        "model_exists": os.path.exists(MODEL_PATH),
+    }
+
 class Row(BaseModel):
     features: dict
 
@@ -139,13 +148,11 @@ async def access_log(request, call_next):
 
 @app.get("/health")
 def health():
-    return {
-        "status": "ok",
-        "model": os.path.basename(MODEL_PATH),
-        "ts": time.time(),
-        "cols": len(_REQUIRED_COLS) or None,
-        "model_exists": os.path.exists(MODEL_PATH)
-    }
+    return _health_payload()
+
+@app.get("/healthz")
+def healthz():
+    return _health_payload()
 
 @app.get("/schema")
 def schema():
