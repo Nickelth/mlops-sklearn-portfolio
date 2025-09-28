@@ -2,49 +2,93 @@
 
 ## (2025-09-28)
 
-目的:
-- エンドポイント名の不一致解消(`health`に統一)
-- ログの出力先: JSON 1行を stdout→CloudWatchへ
-- 証跡: curl /healthz 成功、TG Healthy スクショ、ECS イベント抜粋
+### 目的
+
+- エンドポイント名の不一致解消（`/health` と `/healthz` の整合）
+- ログの出力先: JSON 1行を **stdout→CloudWatch** へ（ファイル併用）
+- 証跡: `curl /healthz` 成功、TG Healthy スクショ、ECS イベント抜粋
 
 ### 主要変更
 
+- **API（`api/app.py`）**
+  - 構造化ログを **FileHandler + StreamHandler(stdout)** で二重出力（CloudWatch 取り込み用）。
+  - `/healthz` を提供（`/health` との互換維持）、`/metrics` は既存のまま。
+
+- **ECS/ALB**
+  - （切替前確認）ALB 経由 `/healthz` が 200 を返すことを事前検証。
+  - **TG ヘルスチェックを `/healthz` に切替**（`HttpCode=200-399`, interval=10s, healthy=2）。
+  - `aws ecs update-service --force-new-deployment` によりローリング更新。
+
 ### 証跡
+
+```bash
+docs/evidence/
+├── 20250928_014728_healthz_200.txt                 # /healthz 200（事前確認）
+├── 20250928_015634_healthz_200.txt                 # /healthz 200（再確認）
+├── 20250928_015656_cwlogs_boot.txt                 # Uvicorn 起動ログ/構造化ログ
+├── 20250928_015656_ecs_update_force_new.txt        # 強制再デプロイ実行ログ
+├── 20250928_015656_health_200.txt                  # 互換のため /health 200
+├── 20250928_015656_healthz_404.txt                 # 切替手順中の一時 404（整合性確認）
+├── 20250928_020535_healthz_200_pre_switch.txt      # TG 切替前の /healthz 200
+├── 20250928_020553_tg_hc_switch_to_healthz.txt     # TG を /healthz へ切替
+├── 20250928_020553_tg_health_after_switch.txt      # 切替後 Healthy 確認
+├── 20250928_020611_ecs_events.txt                  # ECS イベント抜粋
+├── 20250928_020611_healthz_200_final.txt           # 最終 /healthz 200
+└── 20250928_020611_metrics_200.txt                 # /metrics 200
+```
+
+コマンドは![付録：証跡用打鍵コマンド (2025-09-28)](CHANGELOG_2025-09-28.md)を参照。
 
 ### ロールアウト
 
+1. 新タスク（`/healthz` 提供・stdout ログ化）を **`--force-new-deployment`** で展開。
+2. **切替前**に ALB 経由 `curl /healthz` で 200 を確認（互換で `/health` も 200）。
+3. **TG のヘルスチェックを `/healthz` に変更** → Target Healthy を確認。
+4. `/metrics` 正常応答と CloudWatch 取り込みを確認。
+5. すべてのコマンド出力を `docs/evidence/*.txt` に保存し証跡化。
+
 ### リスクと対策
 
+- **ヘルスエンドポイント混在**: しばらく `/health` と `/healthz` を併存し互換維持。ダッシュボード/ALB は `/healthz` に統一。
+- **一時的な 404/Unhealthy**: 切替は **事前 200 確認 → TG 切替 → Healthy 確認** の順で最小化。必要に応じ `grace` を延長。
+- **ログ重複/出力過多**: File + stdout の二重出力は保守期間限定。必要に応じてサンプリング/フィルタを適用。
+
 ### 次アクション
+
+- ダッシュボード（CW Logs Insights + `/metrics`）で SLO 可視化。
+- `/health` の段階的廃止計画（依存の有無を調査 → アナウンス → 削除）。
+- TG/ALB のヘルス関連 Alarm（`UnHealthyHostCount > 0` など）を追加。
 
 ---
 
 ## ECS無停止デプロイ（2025-09-14 → 2025-09-27）
 
-目的: Fargate/ECS を ALB 配下で無停止更新。証跡で可観測・再現可能に。
+### 目的
+
+Fargate/ECS を ALB 配下で無停止更新。証跡で可観測・再現可能に。
 
 ### 主要変更
 
-* Infra（ecs.tf）
+- Infra（ecs.tf）
 
-  * deployment_circuit_breaker=on, health_check_grace_period_seconds=60
-  * task_role_arn 追加 + s3:GetObject 付与（MODEL_S3_URI）
-* API（api/app.py）
+  - deployment_circuit_breaker=on, health_check_grace_period_seconds=60
+  - task_role_arn 追加 + s3:GetObject 付与（MODEL_S3_URI）
+- API（api/app.py）
 
-  * 起動時のモデルロードを「可能なら」に緩和、S3フェッチ、/metrics 追加
-* Config（pyproject.toml）
+  - 起動時のモデルロードを「可能なら」に緩和、S3フェッチ、/metrics 追加
+- Config（pyproject.toml）
 
-  * boto3 追加、sklearn バージョン整合（警告解消）
-* Makefile
+  - boto3 追加、sklearn バージョン整合（警告解消）
+- Makefile
 
-  * /tmp で Terraform 実行、tg-health / svc-events / metrics 追加
+  - /tmp で Terraform 実行、tg-health / svc-events / metrics 追加
 
 ### 証跡
 
-* ALB DNS: `mlops-api-alb-1702823157.us-west-2.elb.amazonaws.com`
-* `/health` 200: `docs/evidence/20250927_054140_health.txt`
-* Target Health: healthy（`make tg-health` 出力）
-* CloudWatch Logs: Uvicorn 起動ログ + /health アクセス記録
+- ALB DNS: `mlops-api-alb-1702823157.us-west-2.elb.amazonaws.com`
+- `/health` 200: `docs/evidence/20250927_054140_health.txt`
+- Target Health: healthy（`make tg-health` 出力）
+- CloudWatch Logs: Uvicorn 起動ログ + /health アクセス記録
 
 ### ロールアウト
 
@@ -54,14 +98,14 @@
 
 ### リスクと対策
 
-* モデル未配置: /predict 初回 503、/reload or 先読み実行で回避
-* 依存差異: sklearn pin、Artifacts にメタ付与
-* ロールバック: Circuit breaker + 旧TaskDefinitionへの手動戻し
+- モデル未配置: /predict 初回 503、/reload or 先読み実行で回避
+- 依存差異: sklearn pin、Artifacts にメタ付与
+- ロールバック: Circuit breaker + 旧TaskDefinitionへの手動戻し
 
 ### 次アクション
 
-* `/metrics` をダッシュボード集約
-* モデル配布に署名/ハッシュ検証
+- `/metrics` をダッシュボード集約
+- モデル配布に署名/ハッシュ検証
 
 ---
 
