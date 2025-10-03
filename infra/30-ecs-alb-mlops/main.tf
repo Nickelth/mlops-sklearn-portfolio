@@ -59,33 +59,38 @@ resource "aws_ecs_cluster" "this" {
 }
 
 resource "aws_ecs_task_definition" "api" {
-  family                   = "mlops-api-task"
-  requires_compatibilities = ["FARGATE"]
+  family                   = "${var.project}-task"
   network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
   cpu                      = 256
   memory                   = 512
+
   execution_role_arn       = data.aws_iam_role.task_execution.arn
   task_role_arn            = data.aws_iam_role.task_role.arn
 
-  container_definitions = jsonencode([{
-    name         = "api"
-    image        = local.image_uri
-    essential    = true
-    portMappings = [{ containerPort = var.container_port, hostPort = var.container_port, protocol = "tcp" }]
-    environment  = [
-      { name = "MODEL_PATH",   value = "/app/models/model_openml_adult.joblib" },
-      { name = "MODEL_S3_URI", value = "s3://<BUCKET>/mlops-sklearn-portfolio/models/latest/model_openml_adult.joblib" },
-      { name = "LOG_JSON",     value = "1" }
-    ]
-    logConfiguration = {
-      logDriver = "awslogs",
-      options = {
-        awslogs-group         = data.aws_cloudwatch_log_group.api.name,
-        awslogs-region        = var.region,
-        awslogs-stream-prefix = "api"
+  container_definitions = jsonencode([
+    {
+      name      = "api",
+      image     = var.ecr_repository_url != "" ? "${var.ecr_repository_url}:${var.image_tag}" : local.image_uri,
+      essential = true,
+      portMappings = [{
+        containerPort = var.container_port, hostPort = var.container_port, protocol = "tcp"
+      }],
+      environment = [
+        { name = "MODEL_PATH",   value = "/app/models/model_openml_adult.joblib" },
+        { name = "MODEL_S3_URI", value = "s3://<BUCKET>/mlops-sklearn-portfolio/models/latest/model_openml_adult.joblib" },
+        { name = "LOG_JSON",     value = "1" }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = data.aws_cloudwatch_log_group.api.name
+          awslogs-region        = var.region
+          awslogs-stream-prefix = "api"
+        }
       }
     }
-  }])
+  ])
 }
 
 resource "aws_ecs_service" "api" {
@@ -96,13 +101,13 @@ resource "aws_ecs_service" "api" {
   launch_type     = "FARGATE"
 
   network_configuration {
+    subnets         = data.aws_subnets.default.ids
+    security_groups = [aws_security_group.tasks.id]
     assign_public_ip = true
-    subnets          = data.aws_subnets.default.ids
-    security_groups  = [data.aws_security_group.tasks.id]
   }
 
   load_balancer {
-    target_group_arn = data.aws_lb_target_group.api.arn
+    target_group_arn = aws_lb_target_group.api.arn
     container_name   = "api"
     container_port   = var.container_port
   }
@@ -110,11 +115,19 @@ resource "aws_ecs_service" "api" {
   health_check_grace_period_seconds = 60
   propagate_tags = "SERVICE"
 
+  lifecycle {
+    ignore_changes = [desired_count]
+  }
+
+  depends_on = [
+    aws_lb_listener.http,
+    aws_security_group_rule.alb_to_tasks_8000
+  ]
+
+  tags = { Project = "mlops-sklearn-portfolio" }
+
   deployment_circuit_breaker { 
     enable = true
     rollback = true 
   }
-
-  depends_on = [] # ネットワークは data 参照なので module 間の明示依存は不要
-  tags = { Project = "mlops-sklearn-portfolio" }
 }
