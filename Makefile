@@ -228,8 +228,9 @@ fi
 endef
 
 prep:
->	mkdir -p $(WORKDIR)
->	@$(SYNC_CMD)
+>@mkdir -p $(WORKDIR)
+>@$(SYNC_CMD)
+>@cp -f $(TFDIR)/dev.tfvars $(WORKDIR)/terraform.tfvars
 
 # CloudShell の容量回避で -chdir を使用
 tf-init: prep
