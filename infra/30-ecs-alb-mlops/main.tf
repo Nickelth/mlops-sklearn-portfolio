@@ -102,12 +102,12 @@ resource "aws_ecs_service" "api" {
 
   network_configuration {
     subnets         = data.aws_subnets.default.ids
-    security_groups = [aws_security_group.tasks.id]
+    security_groups = [data.aws_security_group.tasks.id]
     assign_public_ip = true
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.api.arn
+    target_group_arn = data.aws_lb_target_group.api.arn
     container_name   = "api"
     container_port   = var.container_port
   }
@@ -118,11 +118,6 @@ resource "aws_ecs_service" "api" {
   lifecycle {
     ignore_changes = [desired_count]
   }
-
-  depends_on = [
-    aws_lb_listener.http,
-    aws_security_group_rule.alb_to_tasks_8000
-  ]
 
   tags = { Project = "mlops-sklearn-portfolio" }
 
