@@ -1,17 +1,3 @@
-variable "region"     { type = string }
-variable "image_tag"  { 
-    type = string  
-    default = "latest" 
-    }
-variable "ecr_repo"   { 
-    type = string  
-    default = "mlops-sklearn-portfolio" 
-    }
-variable "container_port" { 
-    type = number 
-    default = 8000 
-    }
-
 # 既存の default VPC / サブネットを name/タグではなく "default" で拾う薄切り
 data "aws_vpc" "default" { default = true }
 data "aws_subnets" "default" {
@@ -35,15 +21,6 @@ locals {
 # （ロール重複エラー回避のため data ソース参照のみに統一）
 data "aws_iam_role" "task_execution" { name = "mlops-ecsTaskExecutionRole" }
 data "aws_iam_role" "task_role"      { name = "mlops-ecsTaskRole" }
-
-resource "aws_ecs_cluster" "this" {
-  name = "mlops-api-cluster"
-  setting { 
-    name="containerInsights" 
-    value="enabled" 
-    }
-  tags = { Project = "mlops-sklearn-portfolio" }
-}
 
 resource "aws_ecs_task_definition" "api" {
   family                   = "${var.project}-task"

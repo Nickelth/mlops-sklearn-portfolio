@@ -46,3 +46,11 @@ variable "desired_count" {
   type = number
   default = 1 
 }
+variable "image_tag"  { 
+  type = string  
+  default = "latest" 
+}
+variable "ecr_repo"   { 
+  type = string  
+  default = "mlops-sklearn-portfolio" 
+}

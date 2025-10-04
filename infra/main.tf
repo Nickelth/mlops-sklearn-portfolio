@@ -1,8 +1,5 @@
 module "network" {
   source = "./00-network"
-  project = var.project
-  region  = var.region
-  # ここに VPC/Subnet 等の入力があれば渡す
 }
 
 module "ecr" {
