@@ -1,0 +1,5 @@
+[0m[1mInitializing the backend...[0m
+[0m[1mUpgrading modules...[0m
+- ecr in 20-ecr
+- ecs in 30-ecs-alb-mlops
+- network in 00-network

@@ -1,0 +1,63 @@
+[0m[1mmodule.network.data.aws_vpc.default: Reading...[0m[0m
+[0m[1mmodule.network.aws_cloudwatch_log_group.api: Refreshing state... [id=/mlops/api][0m
+[0m[1mmodule.network.data.aws_cloudwatch_log_group.api: Reading...[0m[0m
+[0m[1mmodule.network.data.aws_cloudwatch_log_group.api: Read complete after 0s [id=/mlops/api][0m
+[0m[1mmodule.network.data.aws_vpc.default: Read complete after 0s [id=vpc-0fbda65c351254bb3][0m
+[0m[1mmodule.network.data.aws_subnets.default: Reading...[0m[0m
+[0m[1mmodule.network.aws_security_group.alb: Refreshing state... [id=sg-05d99b7865dd3fa50][0m
+[0m[1mmodule.network.aws_lb_target_group.api: Refreshing state... [id=arn:aws:elasticloadbalancing:us-west-2:438336773404:targetgroup/mlops-api-tg/4eecab19de56b011][0m
+[0m[1mmodule.network.aws_security_group.tasks: Refreshing state... [id=sg-0c2f455eb2ccdea5a][0m
+[0m[1mmodule.network.data.aws_subnets.default: Read complete after 0s [id=us-west-2][0m
+[0m[1mmodule.network.data.aws_security_group.tasks: Reading...[0m[0m
+[0m[1mmodule.network.aws_security_group_rule.alb_to_tasks_8000: Refreshing state... [id=sgrule-1815184618][0m
+[0m[1mmodule.network.data.aws_security_group.alb: Reading...[0m[0m
+[0m[1mmodule.network.aws_lb.api: Refreshing state... [id=arn:aws:elasticloadbalancing:us-west-2:438336773404:loadbalancer/app/mlops-api-alb/e48922b94a04da84][0m
+[0m[1mmodule.network.data.aws_security_group.tasks: Read complete after 0s [id=sg-0c2f455eb2ccdea5a][0m
+[0m[1mmodule.network.data.aws_security_group.alb: Read complete after 0s [id=sg-05d99b7865dd3fa50][0m
+[0m[1mmodule.network.data.aws_lb_target_group.api: Reading...[0m[0m
+[0m[1mmodule.network.data.aws_lb_target_group.api: Read complete after 0s [id=arn:aws:elasticloadbalancing:us-west-2:438336773404:targetgroup/mlops-api-tg/4eecab19de56b011][0m
+[0m[1mmodule.network.data.aws_lb.api: Reading...[0m[0m
+[0m[1mmodule.network.aws_lb_listener.http: Refreshing state... [id=arn:aws:elasticloadbalancing:us-west-2:438336773404:listener/app/mlops-api-alb/e48922b94a04da84/46e5ef01ac82fec4][0m
+[0m[1mmodule.network.data.aws_lb.api: Read complete after 0s [id=arn:aws:elasticloadbalancing:us-west-2:438336773404:loadbalancer/app/mlops-api-alb/e48922b94a04da84][0m
+
+Changes to Outputs:
+  [31m-[0m[0m alb_security_group_id   = "sg-05d99b7865dd3fa50" [90m-> null[0m[0m
+  [31m-[0m[0m tg_arn                  = "arn:aws:elasticloadbalancing:us-west-2:438336773404:targetgroup/mlops-api-tg/4eecab19de56b011" [90m-> null[0m[0m
+
+You can apply this plan to save these new output values to the Terraform
+state, without changing any real infrastructure.
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mResource targeting is in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mYou are creating a plan with the -target option, which means that the result of this plan may not represent all of the changes requested by the current configuration.
+[33m│[0m [0m
+[33m│[0m [0mThe -target option is not for routine use, and is provided only for exceptional situations such as recovering from errors or mistakes, or when Terraform specifically suggests to use it as part of an error message.
+[33m╵[0m[0m
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mApplied changes may be incomplete[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe plan was created with the -target option in effect, so some changes requested in the configuration may have been ignored and the output values may not be fully updated. Run the following command to verify that no other changes are pending:
+[33m│[0m [0m    terraform plan
+[33m│[0m [0m
+[33m│[0m [0mNote that the -target option is not suitable for routine use, and is provided only for exceptional situations such as recovering from errors or mistakes, or when Terraform specifically suggests to use it as part of an error message.
+[33m╵[0m[0m
+[0m[1m[32m
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+[0m[0m[1m[32m
+Outputs:
+
+[0malb_arn = "arn:aws:elasticloadbalancing:us-west-2:438336773404:loadbalancer/app/mlops-api-alb/e48922b94a04da84"
+alb_dns = "mlops-api-alb-580667902.us-west-2.elb.amazonaws.com"
+alb_dns_name = "mlops-api-alb-580667902.us-west-2.elb.amazonaws.com"
+bucket_arn = "arn:aws:s3:::nickelth-mlops-artifacts"
+bucket_name = "nickelth-mlops-artifacts"
+cluster_name = "mlops-api-cluster"
+dynamodb_lock_table = "tf-lock"
+ecr_image_uri = "438336773404.dkr.ecr.us-west-2.amazonaws.com/mlops-sklearn-portfolio:latest"
+ecs_cluster_arn = "arn:aws:ecs:us-west-2:438336773404:cluster/mlops-api-cluster"
+ecs_service_name = "mlops-api-svc"
+log_group_name = "/mlops/api"
+region = "us-west-2"
+taskdef_arn = "arn:aws:ecs:us-west-2:438336773404:task-definition/mlops-sklearn-portfolio-task:3"
+tasks_security_group_id = "sg-0c2f455eb2ccdea5a"
+tfstate_bucket = "nickelth-tfstate"

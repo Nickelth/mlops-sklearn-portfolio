@@ -1,0 +1,13 @@
+data.aws_caller_identity.current
+aws_s3_bucket.artifacts
+module.ecs.data.aws_caller_identity.current
+module.ecs.data.aws_cloudwatch_log_group.api
+module.ecs.data.aws_iam_role.task_execution
+module.ecs.data.aws_iam_role.task_role
+module.ecs.data.aws_lb_target_group.api
+module.ecs.data.aws_subnets.default
+module.ecs.data.aws_vpc.default
+module.ecs.aws_ecs_cluster.this
+module.ecs.aws_ecs_task_definition.api
+module.network.data.aws_subnets.default
+module.network.data.aws_vpc.default

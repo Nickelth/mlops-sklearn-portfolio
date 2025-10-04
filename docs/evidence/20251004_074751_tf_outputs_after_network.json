@@ -1,0 +1,87 @@
+{
+  "alb_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:elasticloadbalancing:us-west-2:438336773404:loadbalancer/app/mlops-api-alb/e48922b94a04da84"
+  },
+  "alb_dns": {
+    "sensitive": false,
+    "type": "string",
+    "value": "mlops-api-alb-580667902.us-west-2.elb.amazonaws.com"
+  },
+  "alb_dns_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "mlops-api-alb-580667902.us-west-2.elb.amazonaws.com"
+  },
+  "alb_security_group_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "sg-05d99b7865dd3fa50"
+  },
+  "bucket_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:s3:::nickelth-mlops-artifacts"
+  },
+  "bucket_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "nickelth-mlops-artifacts"
+  },
+  "cluster_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "mlops-api-cluster"
+  },
+  "dynamodb_lock_table": {
+    "sensitive": false,
+    "type": "string",
+    "value": "tf-lock"
+  },
+  "ecr_image_uri": {
+    "sensitive": false,
+    "type": "string",
+    "value": "438336773404.dkr.ecr.us-west-2.amazonaws.com/mlops-sklearn-portfolio:latest"
+  },
+  "ecs_cluster_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:ecs:us-west-2:438336773404:cluster/mlops-api-cluster"
+  },
+  "ecs_service_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "mlops-api-svc"
+  },
+  "log_group_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "/mlops/api"
+  },
+  "region": {
+    "sensitive": false,
+    "type": "string",
+    "value": "us-west-2"
+  },
+  "taskdef_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:ecs:us-west-2:438336773404:task-definition/mlops-sklearn-portfolio-task:3"
+  },
+  "tasks_security_group_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "sg-0c2f455eb2ccdea5a"
+  },
+  "tfstate_bucket": {
+    "sensitive": false,
+    "type": "string",
+    "value": "nickelth-tfstate"
+  },
+  "tg_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:elasticloadbalancing:us-west-2:438336773404:targetgroup/mlops-api-tg/4eecab19de56b011"
+  }
+}
