@@ -45,51 +45,51 @@ api/  src/  models/  artifacts/  logs/  tests/  docs/
 
 ### 完成定義
 
-- [ ] **ALB 経由 /healthz が常時 200**（ターゲットグループ Healthy） 
+- [x] **ALB 経由 /healthz が常時 200**（ターゲットグループ Healthy） 
 
-- [ ] **手動デプロイが再現可能**（新 TaskDef 登録 → force-new-deployment → 直前リビジョンへロールバックできる） 
+- [x] **手動デプロイが再現可能**（新 TaskDef 登録 → force-new-deployment → 直前リビジョンへロールバックできる） 
 
-- [ ] **観測の入口**として CloudWatch Logs に構造化ログが出ている（JSON1行） 
+- [x] **観測の入口**として CloudWatch Logs に構造化ログが出ている（JSON1行） 
 
 - [x] **IaC“薄切り”**（VPC/ALB/TG/ECS/ECR の最小一式を Terraform で再現可能。Import 完全一致は捨てる） 
 
-- [ ] **evidenceフォルダ配下**：curl結果、ALB/TGヘルスSS、ECSイベント抜粋、terraform plan 抜粋 
+- [x] **evidenceフォルダ配下**：curl結果、ALB/TGヘルスSS、ECSイベント抜粋、terraform plan 抜粋 
 
-- [ ] 「手動デプロイ再現可能」に**失敗からのロールバック実演**を明記。
+- [x] 「手動デプロイ再現可能」に**失敗からのロールバック実演**を明記。
 
-- [ ] **観測はアラームを最低1個具体化**（例: 5xx率、TargetResponseTime、タスク異常終了）。 
+- [x] **観測はアラームを最低1個具体化**（例: 5xx率、TargetResponseTime、タスク異常終了）。 
 
-- [ ] **CLI履歴の証跡化**: scriptコマンドかbash -xログ、加えてCloudTrail + Configを記事に添える
+- [x] **CLI履歴の証跡化**: scriptコマンドかbash -xログ、加えてCloudTrail + Configを記事に添える
 
 ### 証跡チェックリスト
 
-- [ ] ALB/TG: ヘルス一覧SS、curl -I https://{alb}/healthz、ターゲット登録変遷のイベント抜粋 : **_healthz_200_final.txt（curl -i）**
+- [x] ALB/TG: ヘルス一覧SS、curl -I https://{alb}/healthz、ターゲット登録変遷のイベント抜粋 : **_healthz_200_final.txt（curl -i）**
 
     - [ ] スクショ（TG Healthy, ALB Listeners）→ *_tg_healthy.png, *_alb_listener.png
 
-- [ ] ECS: 新旧TaskDef ARN、force-new-deployment 実行ログ、ロールバックの実演記録
+- [x] ECS: 新旧TaskDef ARN、force-new-deployment 実行ログ、ロールバックの実演記録
 
-    - [ ] *_ecs_force_new_success.txt / *_ecs_events_rollback_demo.txt
+    - [x] *_ecs_force_new_success.txt / *_ecs_events_rollback_demo.txt
 
-    - [ ] *_prev_taskdef.txt / *_ecs_rollback_to_prev.txt
+    - [x] *_prev_taskdef.txt / *_ecs_rollback_to_prev.txt
 
-- [ ] CloudWatch Logs: 1行JSON例、@timestamp、level, requestId, path, latency_ms, status
+- [x] CloudWatch Logs: 1行JSON例、@timestamp、level, requestId, path, latency_ms, status
 
-    - [ ] *_cwlogs_json_line.txt（1行JSON例）
+    - [x] *_cwlogs_json_line.txt（1行JSON例）
 
-- [ ] CloudWatch Metrics/Alarm: 3件以上、しきい値と期間、誤検知のメモ
+- [x] CloudWatch Metrics/Alarm: 3件以上、しきい値と期間、誤検知のメモ
 
-    - [ ] *_cw_alarm_put_5xx.txt / *_cw_alarm_describe_5xx.txt
+    - [x] *_cw_alarm_put_5xx.txt / *_cw_alarm_describe_5xx.txt
 
-- [ ] IaC: terraform plan 抜粋、State分離の方針メモ、命名規約1ページ
+- [x] IaC: terraform plan 抜粋、State分離の方針メモ、命名規約1ページ
 
-    - [ ] 既存の *_tf_plan_*, *_tf_apply_*, *_alb_dns.txt, *_tf_init_*.txt
+    - [x] 既存の *_tf_plan_*, *_tf_apply_*, *_alb_dns.txt, *_tf_init_*.txt
 
 - [ ] 負荷試験: k6スクリプト、summary.json、p90/RPS/エラー率、ALBアクセスログ抜粋
 
-- [ ] 監査系: CloudTrailとConfigのクエリ内容とエビデンスのパス
+- [x] 監査系: CloudTrailとConfigのクエリ内容とエビデンスのパス
 
-    - [ ] *_cloudtrail_lookup_updateservice.txt（Configは後で追記でも可）
+    - [x] *_cloudtrail_lookup_updateservice.txt（Configは後で追記でも可）
 
 ### 閾値最適化（PR曲線×F1最大）(2025-09-09)
 
