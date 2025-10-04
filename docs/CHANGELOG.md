@@ -1,5 +1,53 @@
 # Changelog
 
+## (2025-10-04)
+
+### 目的
+
+* IaC の“薄切り”を開始し、**Network(ALB/TG/SG/Logs)** と **ECS(Fargate)** を段階適用できる構成にする
+* `terraform plan -target=module.ecs` が通る状態に整備し、**ALB DNS を outputs から取得可能**にする
+
+### 主要変更
+
+* ディレクトリ分割：`infra/00-network`, `20-ecr`, `30-ecs-alb-mlops`（論理分割のみ）
+* ルート `main.tf` をモジュール化し、共通 `variables.tf/versions.tf/providers.tf` を参照
+* `00-network`：
+
+  * ALB / Listener(80) / TargetGroup(`/health`) / CloudWatch Logs / SG(Alb↔Tasks:8000) を最小構成で管理
+  * `outputs.tf` に `alb_dns`, `tg_arn`, `tasks_security_group_id`, `log_group_name` を追加
+* `30-ecs-alb-mlops`：
+
+  * ECS Cluster / Service(回路遮断+HCG=60s) / TaskDefinition を管理
+  * TaskRole を新設し S3 `GetObject`(モデル取得) の専用ポリシーを付与
+* `-target` で段階 plan/apply（`network → ecs`）が可能な依存に整理
+
+### 証跡
+
+* `docs/evidence/*_tf_init_after_region_fix.txt`
+* `docs/evidence/*_tf_plan_target_network.txt`
+* `docs/evidence/*_tf_apply_target_network.txt`
+* `docs/evidence/*_tf_plan_target_ecs.txt`
+* `docs/evidence/*_tf_apply_target_ecs.txt`
+* 代表出力（apply 後 Outputs）
+
+  * `alb_dns`: `mlops-api-alb-580667902.us-west-2.elb.amazonaws.com`
+  * `ecs_service_name`: `mlops-api-svc` / `cluster_name`: `mlops-api-cluster`
+  * `taskdef_arn`: `...:task-definition/mlops-sklearn-portfolio-task:4`
+
+### ロールアウト
+
+1. CloudShell で `terraform init`（/tmp キャッシュ利用）
+2. `terraform plan -target=module.network` → `terraform apply -target=module.network`
+3. `terraform plan -target=module.ecs` → `terraform apply -target=module.ecs`
+4. 出力の `alb_dns` を取得し、ALB/TG が **Healthy** であることを確認（`/health` 設定のまま）
+5. 以降のデプロイは ECR の `:latest` 更新後、`ecs update-service --force-new-deployment`（別ワークフローで実施）
+
+### 残課題
+
+負荷試験: k6スクリプト、summary.json、p90/RPS/エラー率、ALBアクセスログ抜粋
+
+---
+
 ## (2025-09-28)
 
 ### 目的

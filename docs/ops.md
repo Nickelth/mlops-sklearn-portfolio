@@ -26,6 +26,16 @@ terraform -chdir=/tmp/infra plan -target=module.ecs \
 * `make prep` が `dev.tfvars` を `terraform.tfvars` として同期するため、`bucket_name` などの必須変数を手動で渡す必要がない。
 * `-target` で一部モジュールのみを計画する場合、未対象のモジュール出力は `null` を返す（エラーではなくなる）。
 
+### 機密情報のマスク
+
+アクセスキーやアカウントIDをログに載せてコミットしてしまったとき用。
+
+`~/docs/replacement.txt`に記載の`regex`に従いログファイルの文字を置換する。
+
+```bash
+git filter-repo --replace-text /docs/replacements.txt
+```
+
 ## 緊急時
 
 * 手順は `severe_disaster_manual.md` を参照（監査向け）。

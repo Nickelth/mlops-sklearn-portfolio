@@ -43,7 +43,7 @@ api/  src/  models/  artifacts/  logs/  tests/  docs/
 - /reload の切替所要時間（ms）
 - S3 latest/ とスナップショットの両立運用方針（既に書いてるならリンクだけ）
 
-### 完成定義
+### 完成定義(2025-10-04 Complete)
 
 - [x] **ALB 経由 /healthz が常時 200**（ターゲットグループ Healthy） 
 
@@ -65,7 +65,10 @@ api/  src/  models/  artifacts/  logs/  tests/  docs/
 
 - [x] ALB/TG: ヘルス一覧SS、curl -I https://{alb}/healthz、ターゲット登録変遷のイベント抜粋 : **_healthz_200_final.txt（curl -i）**
 
-    - [ ] スクショ（TG Healthy, ALB Listeners）→ *_tg_healthy.png, *_alb_listener.png
+    - [x] スクショ（TG Healthy, ALB Listeners）→ *_tg_healthy.png, *_alb_listener.png
+
+    ![TG Healthy](docs/evidence/20251004_091200_tg_healthy.png)
+    ![ALB Listeners](docs/evidence/20251004_094800_alb_listener.png)
 
 - [x] ECS: 新旧TaskDef ARN、force-new-deployment 実行ログ、ロールバックの実演記録
 
