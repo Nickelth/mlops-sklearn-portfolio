@@ -244,7 +244,7 @@ tf-destroy:
 
 # ALB DNS を拾って evidence に保存
 tf-output:
->	@DNS=$$(terraform -chdir=$(WORKDIR) output -raw alb_dns_name); \
+>	@DNS=$$(terraform -chdir=$(WORKDIR) output -raw alb_dns); \
 >	echo $$DNS | tee docs/evidence/$(TS)_alb_dns.txt; \
 >	echo "http://$$DNS";
 
