@@ -51,7 +51,7 @@ api/  src/  models/  artifacts/  logs/  tests/  docs/
 
 - [ ] **観測の入口**として CloudWatch Logs に構造化ログが出ている（JSON1行） 
 
-- [ ] **IaC は“薄切り”**（VPC/ALB/TG/ECS/ECR の最小一式を Terraform で再現可能。Import 完全一致は捨てる） 
+- [x] **IaC“薄切り”**（VPC/ALB/TG/ECS/ECR の最小一式を Terraform で再現可能。Import 完全一致は捨てる） 
 
 - [ ] **evidenceフォルダ配下**：curl結果、ALB/TGヘルスSS、ECSイベント抜粋、terraform plan 抜粋 
 
@@ -63,19 +63,33 @@ api/  src/  models/  artifacts/  logs/  tests/  docs/
 
 ### 証跡チェックリスト
 
-- [ ] ALB/TG: ヘルス一覧SS、curl -I https://{alb}/healthz、ターゲット登録変遷のイベント抜粋
+- [ ] ALB/TG: ヘルス一覧SS、curl -I https://{alb}/healthz、ターゲット登録変遷のイベント抜粋 : **_healthz_200_final.txt（curl -i）**
+
+    - [ ] スクショ（TG Healthy, ALB Listeners）→ *_tg_healthy.png, *_alb_listener.png
 
 - [ ] ECS: 新旧TaskDef ARN、force-new-deployment 実行ログ、ロールバックの実演記録
 
+    - [ ] *_ecs_force_new_success.txt / *_ecs_events_rollback_demo.txt
+
+    - [ ] *_prev_taskdef.txt / *_ecs_rollback_to_prev.txt
+
 - [ ] CloudWatch Logs: 1行JSON例、@timestamp、level, requestId, path, latency_ms, status
+
+    - [ ] *_cwlogs_json_line.txt（1行JSON例）
 
 - [ ] CloudWatch Metrics/Alarm: 3件以上、しきい値と期間、誤検知のメモ
 
+    - [ ] *_cw_alarm_put_5xx.txt / *_cw_alarm_describe_5xx.txt
+
 - [ ] IaC: terraform plan 抜粋、State分離の方針メモ、命名規約1ページ
+
+    - [ ] 既存の *_tf_plan_*, *_tf_apply_*, *_alb_dns.txt, *_tf_init_*.txt
 
 - [ ] 負荷試験: k6スクリプト、summary.json、p90/RPS/エラー率、ALBアクセスログ抜粋
 
 - [ ] 監査系: CloudTrailとConfigのクエリ内容とエビデンスのパス
+
+    - [ ] *_cloudtrail_lookup_updateservice.txt（Configは後で追記でも可）
 
 ### 閾値最適化（PR曲線×F1最大）(2025-09-09)
 
