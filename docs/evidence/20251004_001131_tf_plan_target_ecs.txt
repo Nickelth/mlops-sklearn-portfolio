@@ -1,0 +1,4 @@
+[0m[1mvar.bucket_name[0m
+  Global-unique S3 bucket name for artifacts/models/logs
+
+  [1mEnter a value:[0m [0m

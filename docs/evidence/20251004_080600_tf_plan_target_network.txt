@@ -1,0 +1,40 @@
+[0m[1mmodule.network.aws_cloudwatch_log_group.api: Refreshing state... [id=/mlops/api][0m
+[0m[1mmodule.network.data.aws_vpc.default: Reading...[0m[0m
+[0m[1mmodule.network.data.aws_cloudwatch_log_group.api: Reading...[0m[0m
+[0m[1mmodule.network.data.aws_cloudwatch_log_group.api: Read complete after 0s [id=/mlops/api][0m
+[0m[1mmodule.network.data.aws_vpc.default: Read complete after 0s [id=<vpc-id>][0m
+[0m[1mmodule.network.aws_security_group.tasks: Refreshing state... [id=<sg-id>][0m
+[0m[1mmodule.network.data.aws_subnets.default: Reading...[0m[0m
+[0m[1mmodule.network.aws_lb_target_group.api: Refreshing state... [id=arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/4eecab19de56b011][0m
+[0m[1mmodule.network.aws_security_group.alb: Refreshing state... [id=<sg-id>][0m
+[0m[1mmodule.network.data.aws_subnets.default: Read complete after 0s [id=us-west-2][0m
+[0m[1mmodule.network.data.aws_security_group.alb: Reading...[0m[0m
+[0m[1mmodule.network.data.aws_security_group.tasks: Reading...[0m[0m
+[0m[1mmodule.network.aws_security_group_rule.alb_to_tasks_8000: Refreshing state... [id=sgrule-1815184618][0m
+[0m[1mmodule.network.aws_lb.api: Refreshing state... [id=arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:loadbalancer/app/mlops-api-alb/e48922b94a04da84][0m
+[0m[1mmodule.network.data.aws_security_group.alb: Read complete after 1s [id=<sg-id>][0m
+[0m[1mmodule.network.data.aws_security_group.tasks: Read complete after 1s [id=<sg-id>][0m
+[0m[1mmodule.network.data.aws_lb_target_group.api: Reading...[0m[0m
+[0m[1mmodule.network.data.aws_lb_target_group.api: Read complete after 0s [id=arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/4eecab19de56b011][0m
+[0m[1mmodule.network.data.aws_lb.api: Reading...[0m[0m
+[0m[1mmodule.network.aws_lb_listener.http: Refreshing state... [id=arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:listener/app/mlops-api-alb/e48922b94a04da84/46e5ef01ac82fec4][0m
+[0m[1mmodule.network.data.aws_lb.api: Read complete after 0s [id=arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:loadbalancer/app/mlops-api-alb/e48922b94a04da84][0m
+
+Changes to Outputs:
+  [31m-[0m[0m alb_security_group_id   = "<sg-id>" [90m-> null[0m[0m
+  [31m-[0m[0m tg_arn                  = "arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/4eecab19de56b011" [90m-> null[0m[0m
+
+You can apply this plan to save these new output values to the Terraform
+state, without changing any real infrastructure.
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mResource targeting is in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mYou are creating a plan with the -target option, which means that the result of this plan may not represent all of the changes requested by the current configuration.
+[33m│[0m [0m
+[33m│[0m [0mThe -target option is not for routine use, and is provided only for exceptional situations such as recovering from errors or mistakes, or when Terraform specifically suggests to use it as part of an error message.
+[33m╵[0m[0m
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

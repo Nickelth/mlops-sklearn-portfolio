@@ -1,0 +1,270 @@
+[0m[1mmodule.ecs.data.aws_iam_role.task_role: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_iam_policy_document.ecs_task_assume: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_security_group.alb: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_security_group.tasks: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_lb_target_group.api: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_cloudwatch_log_group.api: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_vpc.default: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_iam_policy_document.ecs_task_assume: Read complete after 0s [id=1077804475][0m
+[0m[1mmodule.ecs.data.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_iam_role.task_execution: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_caller_identity.current: Read complete after 0s [id=<ACCOUNT_ID>][0m
+[0m[1mmodule.ecs.data.aws_cloudwatch_log_group.api: Read complete after 0s [id=/mlops/api][0m
+[0m[1mmodule.ecs.data.aws_lb_target_group.api: Read complete after 0s [id=arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/312f527296c51177][0m
+[0m[1mmodule.ecs.data.aws_iam_role.task_role: Read complete after 0s [id=mlops-ecsTaskRole][0m
+[0m[1mmodule.ecs.data.aws_vpc.default: Read complete after 0s [id=<vpc-id>][0m
+[0m[1mmodule.ecs.data.aws_subnets.default: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_iam_role.task_execution: Read complete after 0s [id=mlops-ecsTaskExecutionRole][0m
+[0m[1mmodule.ecs.data.aws_subnets.default: Read complete after 0s [id=us-west-2][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+
+Terraform planned the following actions, but then encountered a problem:
+
+[1m  # module.ecs.aws_ecs_cluster.this[0m will be created
+[0m  [32m+[0m[0m resource "aws_ecs_cluster" "this" {
+      [32m+[0m[0m arn      = (known after apply)
+      [32m+[0m[0m id       = (known after apply)
+      [32m+[0m[0m name     = "mlops-api-cluster"
+      [32m+[0m[0m tags     = {
+          [32m+[0m[0m "Project" = "mlops-sklearn-portfolio"
+        }
+      [32m+[0m[0m tags_all = {
+          [32m+[0m[0m "Env"     = "dev"
+          [32m+[0m[0m "Managed" = "terraform"
+          [32m+[0m[0m "Project" = "mlops-sklearn-portfolio"
+        }
+
+      [32m+[0m[0m setting {
+          [32m+[0m[0m name  = "containerInsights"
+          [32m+[0m[0m value = "enabled"
+        }
+    }
+
+[1m  # module.ecs.aws_ecs_task_definition.api[0m will be created
+[0m  [32m+[0m[0m resource "aws_ecs_task_definition" "api" {
+      [32m+[0m[0m arn                      = (known after apply)
+      [32m+[0m[0m arn_without_revision     = (known after apply)
+      [32m+[0m[0m container_definitions    = jsonencode(
+            [
+              [32m+[0m[0m {
+                  [32m+[0m[0m environment      = [
+                      [32m+[0m[0m {
+                          [32m+[0m[0m name  = "LOG_JSON"
+                          [32m+[0m[0m value = "1"
+                        },
+                      [32m+[0m[0m {
+                          [32m+[0m[0m name  = "MODEL_PATH"
+                          [32m+[0m[0m value = "/app/models/model_openml_adult.joblib"
+                        },
+                      [32m+[0m[0m {
+                          [32m+[0m[0m name  = "MODEL_S3_URI"
+                          [32m+[0m[0m value = "s3://<BUCKET>/mlops-sklearn-portfolio/models/latest/model_openml_adult.joblib"
+                        },
+                    ]
+                  [32m+[0m[0m essential        = true
+                  [32m+[0m[0m image            = "<ECR_REGISTRY>/mlops-sklearn-portfolio:latest"
+                  [32m+[0m[0m logConfiguration = {
+                      [32m+[0m[0m logDriver = "awslogs"
+                      [32m+[0m[0m options   = {
+                          [32m+[0m[0m awslogs-group         = "/mlops/api"
+                          [32m+[0m[0m awslogs-region        = "us-west-2"
+                          [32m+[0m[0m awslogs-stream-prefix = "api"
+                        }
+                    }
+                  [32m+[0m[0m name             = "api"
+                  [32m+[0m[0m portMappings     = [
+                      [32m+[0m[0m {
+                          [32m+[0m[0m containerPort = 8000
+                          [32m+[0m[0m hostPort      = 8000
+                          [32m+[0m[0m protocol      = "tcp"
+                        },
+                    ]
+                },
+            ]
+        )
+      [32m+[0m[0m cpu                      = "256"
+      [32m+[0m[0m enable_fault_injection   = (known after apply)
+      [32m+[0m[0m execution_role_arn       = "arn:aws:iam::<ACCOUNT_ID>:role/mlops-ecsTaskExecutionRole"
+      [32m+[0m[0m family                   = "mlops-sklearn-portfolio-task"
+      [32m+[0m[0m id                       = (known after apply)
+      [32m+[0m[0m memory                   = "512"
+      [32m+[0m[0m network_mode             = "awsvpc"
+      [32m+[0m[0m requires_compatibilities = [
+          [32m+[0m[0m "FARGATE",
+        ]
+      [32m+[0m[0m revision                 = (known after apply)
+      [32m+[0m[0m skip_destroy             = false
+      [32m+[0m[0m tags_all                 = {
+          [32m+[0m[0m "Env"     = "dev"
+          [32m+[0m[0m "Managed" = "terraform"
+          [32m+[0m[0m "Project" = "mlops-sklearn-portfolio"
+        }
+      [32m+[0m[0m task_role_arn            = "arn:aws:iam::<ACCOUNT_ID>:role/mlops-ecsTaskRole"
+      [32m+[0m[0m track_latest             = false
+    }
+
+[1m  # module.ecs.aws_iam_policy.s3_get_model[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_policy" "s3_get_model" {
+      [32m+[0m[0m arn              = (known after apply)
+      [32m+[0m[0m attachment_count = (known after apply)
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m name             = "mlops-sklearn-portfolio-ecs-s3-get-model"
+      [32m+[0m[0m name_prefix      = (known after apply)
+      [32m+[0m[0m path             = "/"
+      [32m+[0m[0m policy           = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action   = [
+                          [32m+[0m[0m "s3:GetObject",
+                        ]
+                      [32m+[0m[0m Effect   = "Allow"
+                      [32m+[0m[0m Resource = "arn:aws:s3:::nickelth-mlops-artifacts/mlops-sklearn-portfolio/models/latest/*"
+                      [32m+[0m[0m Sid      = "GetModelObject"
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m policy_id        = (known after apply)
+      [32m+[0m[0m tags_all         = {
+          [32m+[0m[0m "Env"     = "dev"
+          [32m+[0m[0m "Managed" = "terraform"
+          [32m+[0m[0m "Project" = "mlops-sklearn-portfolio"
+        }
+    }
+
+[1m  # module.ecs.aws_iam_role.ecs_task_execution[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "ecs_task_execution" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "ecs-tasks.amazonaws.com"
+                        }
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "mlops-ecsTaskExecutionRole"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = {
+          [32m+[0m[0m "Env"     = "dev"
+          [32m+[0m[0m "Managed" = "terraform"
+          [32m+[0m[0m "Project" = "mlops-sklearn-portfolio"
+        }
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # module.ecs.aws_iam_role.ecs_task_role[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "ecs_task_role" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "ecs-tasks.amazonaws.com"
+                        }
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "mlops-ecsTaskRole"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = {
+          [32m+[0m[0m "Env"     = "dev"
+          [32m+[0m[0m "Managed" = "terraform"
+          [32m+[0m[0m "Project" = "mlops-sklearn-portfolio"
+        }
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # module.ecs.aws_iam_role.task_role[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "task_role" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "ecs-tasks.amazonaws.com"
+                        }
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "mlops-sklearn-portfolio-ecs-task-role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = {
+          [32m+[0m[0m "Env"     = "dev"
+          [32m+[0m[0m "Managed" = "terraform"
+          [32m+[0m[0m "Project" = "mlops-sklearn-portfolio"
+        }
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # module.ecs.aws_iam_role_policy_attachment.ecs_task_exec_attach[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "ecs_task_exec_attach" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+      [32m+[0m[0m role       = "mlops-ecsTaskExecutionRole"
+    }
+
+[1m  # module.ecs.aws_iam_role_policy_attachment.task_s3_attach[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "task_s3_attach" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = (known after apply)
+      [32m+[0m[0m role       = "mlops-sklearn-portfolio-ecs-task-role"
+    }
+
+[1mPlan:[0m 8 to add, 0 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [33m~[0m[0m ecs_cluster_arn = "arn:aws:ecs:us-west-2:<ACCOUNT_ID>:cluster/mlops-api-cluster" -> (known after apply)
+  [33m~[0m[0m taskdef_arn     = "arn:aws:ecs:us-west-2:<ACCOUNT_ID>:task-definition/mlops-sklearn-portfolio-task:2" -> (known after apply)
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mResource targeting is in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mYou are creating a plan with the -target option, which means that the result of this plan may not represent all of the changes requested by the current configuration.
+[33m│[0m [0m
+[33m│[0m [0mThe -target option is not for routine use, and is provided only for exceptional situations such as recovering from errors or mistakes, or when Terraform specifically suggests to use it as part of an error message.
+[33m╵[0m[0m

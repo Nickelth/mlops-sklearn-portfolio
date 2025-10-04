@@ -1,0 +1,2 @@
+Move "aws_s3_bucket.artifacts" to "module.ecr.aws_s3_bucket.artifacts"
+Successfully moved 1 object(s).

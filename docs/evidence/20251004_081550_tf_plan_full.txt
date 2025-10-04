@@ -1,0 +1,54 @@
+[0m[1mmodule.ecr.aws_s3_bucket.artifacts: Refreshing state... [id=nickelth-mlops-artifacts][0m
+[0m[1mdata.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mmodule.ecs.aws_ecs_cluster.this: Refreshing state... [id=arn:aws:ecs:us-west-2:<ACCOUNT_ID>:cluster/mlops-api-cluster][0m
+[0m[1mmodule.ecs.aws_iam_policy.s3_get_model: Refreshing state... [id=arn:aws:iam::<ACCOUNT_ID>:policy/mlops-sklearn-portfolio-ecs-s3-get-model][0m
+[0m[1mmodule.network.aws_cloudwatch_log_group.api: Refreshing state... [id=/mlops/api][0m
+[0m[1mmodule.network.data.aws_vpc.default: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_iam_policy_document.ecs_task_assume: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_lb_target_group.api: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_vpc.default: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mdata.aws_caller_identity.current: Read complete after 0s [id=<ACCOUNT_ID>][0m
+[0m[1mmodule.ecs.data.aws_cloudwatch_log_group.api: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_caller_identity.current: Read complete after 0s [id=<ACCOUNT_ID>][0m
+[0m[1mmodule.ecs.data.aws_iam_policy_document.ecs_task_assume: Read complete after 0s [id=1077804475][0m
+[0m[1mmodule.ecs.aws_iam_role.ecs_task_role: Refreshing state... [id=mlops-ecsTaskRole][0m
+[0m[1mmodule.ecs.aws_iam_role.ecs_task_execution: Refreshing state... [id=mlops-ecsTaskExecutionRole][0m
+[0m[1mmodule.ecs.data.aws_cloudwatch_log_group.api: Read complete after 0s [id=/mlops/api][0m
+[0m[1mmodule.network.data.aws_cloudwatch_log_group.api: Reading...[0m[0m
+[0m[1mmodule.network.data.aws_cloudwatch_log_group.api: Read complete after 0s [id=/mlops/api][0m
+[0m[1mmodule.ecs.data.aws_lb_target_group.api: Read complete after 0s [id=arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/4eecab19de56b011][0m
+[0m[1mmodule.ecr.aws_s3_bucket_public_access_block.artifacts: Refreshing state... [id=nickelth-mlops-artifacts][0m
+[0m[1mmodule.ecr.data.aws_iam_policy_document.bucket_policy: Reading...[0m[0m
+[0m[1mmodule.ecr.aws_s3_bucket_server_side_encryption_configuration.artifacts: Refreshing state... [id=nickelth-mlops-artifacts][0m
+[0m[1mmodule.ecr.aws_s3_bucket_versioning.artifacts: Refreshing state... [id=nickelth-mlops-artifacts][0m
+[0m[1mmodule.ecr.data.aws_iam_policy_document.bucket_policy: Read complete after 0s [id=4225914290][0m
+[0m[1mmodule.ecr.aws_s3_bucket_policy.artifacts: Refreshing state... [id=nickelth-mlops-artifacts][0m
+[0m[1mmodule.ecs.data.aws_vpc.default: Read complete after 0s [id=<vpc-id>][0m
+[0m[1mmodule.ecs.data.aws_subnets.default: Reading...[0m[0m
+[0m[1mmodule.network.data.aws_vpc.default: Read complete after 0s [id=<vpc-id>][0m
+[0m[1mmodule.network.aws_security_group.tasks: Refreshing state... [id=<sg-id>][0m
+[0m[1mmodule.network.aws_security_group.alb: Refreshing state... [id=<sg-id>][0m
+[0m[1mmodule.network.data.aws_subnets.default: Reading...[0m[0m
+[0m[1mmodule.network.aws_lb_target_group.api: Refreshing state... [id=arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/4eecab19de56b011][0m
+[0m[1mmodule.network.data.aws_security_group.tasks: Reading...[0m[0m
+[0m[1mmodule.ecs.aws_iam_role_policy_attachment.ecs_task_exec_attach: Refreshing state... [id=mlops-ecsTaskExecutionRole-20251004081239760100000002][0m
+[0m[1mmodule.ecs.data.aws_subnets.default: Read complete after 0s [id=us-west-2][0m
+[0m[1mmodule.ecs.aws_iam_role_policy_attachment.task_s3_attach: Refreshing state... [id=mlops-ecsTaskRole-20251004081239718900000001][0m
+[0m[1mmodule.ecs.aws_ecs_task_definition.api: Refreshing state... [id=mlops-sklearn-portfolio-task][0m
+[0m[1mmodule.network.data.aws_security_group.alb: Reading...[0m[0m
+[0m[1mmodule.network.data.aws_subnets.default: Read complete after 0s [id=us-west-2][0m
+[0m[1mmodule.network.aws_security_group_rule.alb_to_tasks_8000: Refreshing state... [id=sgrule-1815184618][0m
+[0m[1mmodule.network.aws_lb.api: Refreshing state... [id=arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:loadbalancer/app/mlops-api-alb/e48922b94a04da84][0m
+[0m[1mmodule.network.data.aws_security_group.tasks: Read complete after 0s [id=<sg-id>][0m
+[0m[1mmodule.network.data.aws_lb_target_group.api: Reading...[0m[0m
+[0m[1mmodule.network.data.aws_security_group.alb: Read complete after 0s [id=<sg-id>][0m
+[0m[1mmodule.ecs.aws_ecs_service.api: Refreshing state... [id=arn:aws:ecs:us-west-2:<ACCOUNT_ID>:service/mlops-api-cluster/mlops-api-svc][0m
+[0m[1mmodule.network.data.aws_lb_target_group.api: Read complete after 0s [id=arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:targetgroup/mlops-api-tg/4eecab19de56b011][0m
+[0m[1mmodule.network.data.aws_lb.api: Reading...[0m[0m
+[0m[1mmodule.network.aws_lb_listener.http: Refreshing state... [id=arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:listener/app/mlops-api-alb/e48922b94a04da84/46e5ef01ac82fec4][0m
+[0m[1mmodule.network.data.aws_lb.api: Read complete after 1s [id=arn:aws:elasticloadbalancing:us-west-2:<ACCOUNT_ID>:loadbalancer/app/mlops-api-alb/e48922b94a04da84][0m
+
+[0m[1m[31mPlanning failed.[0m[1m Terraform encountered an error while generating this plan.[0m
+
+[0m
