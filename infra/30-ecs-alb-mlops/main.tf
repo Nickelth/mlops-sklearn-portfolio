@@ -94,7 +94,7 @@ resource "aws_ecs_service" "api" {
   }
 
   load_balancer {
-    target_group_arn = data.aws_lb_target_group.api.arn
+    target_group_arn = module.network.tg_arn
     container_name   = "api"
     container_port   = var.container_port
   }

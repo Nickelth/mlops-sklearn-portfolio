@@ -27,3 +27,22 @@ variable "tasks_sg_id" {
     error_message = "tasks_sg_id must be a non-empty security group ID. Provide an override or allow the network module to supply it."
   }
 }
+
+variable "region"        { type = string }
+variable "project"       { type = string }
+
+# network モジュールから渡す
+variable "tg_arn"        { type = string }
+variable "subnet_ids"    { type = list(string) }
+variable "log_group_name"{ type = string }
+
+# イメージやコンテナ設定
+variable "image"         { type = string }
+variable "container_port"{ 
+  type = number
+  default = 8000 
+}
+variable "desired_count" { 
+  type = number
+  default = 1 
+}
