@@ -39,9 +39,9 @@ data "aws_lb_target_group" "api" { name = "mlops-api-tg" }
 data "aws_cloudwatch_log_group" "api" { name = "/mlops/api" }
 
 # ECR リポジトリURIを region / account から補完（完全URIが var.ecr_repo に来てもOK）
-data "aws_caller_identity" "me" {}
+data "aws_caller_identity" "current" {}
 locals {
-  ecr_repo_uri = can(regex(".amazonaws.com/", var.ecr_repo)) ? var.ecr_repo : "${data.aws_caller_identity.me.account_id}.dkr.ecr.${var.region}.amazonaws.com/${var.ecr_repo}"
+  ecr_repo_uri = can(regex(".amazonaws.com/", var.ecr_repo)) ? var.ecr_repo : "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com/${var.ecr_repo}"
   image_uri = "${local.ecr_repo_uri}:${var.image_tag}"
 }
 
