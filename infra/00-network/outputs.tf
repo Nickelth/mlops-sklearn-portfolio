@@ -28,14 +28,10 @@ output "alb_dns_name" {
   description = "Application Load Balancer DNS name (deprecated; prefer alb_dns)"
 }
 
-
 output "alb_arn" {
   value       = aws_lb.api.arn
   description = "Application Load Balancer ARN (null when ALB not targeted in a partial plan)"
 }
 
-
-
-
-
-
+output "tasks_security_group_id" { value = aws_security_group.tasks.id }
+output "public_subnet_ids"       { value = [ for s in aws_subnet.public : s.id ] }

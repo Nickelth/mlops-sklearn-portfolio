@@ -1,10 +1,14 @@
 module "network" {
   source = "./00-network"
+  project = var.project
+  region  = var.region
 }
 
 module "ecr" {
   source = "./20-ecr"
   bucket_name = var.bucket_name
+  project = var.project
+  region  = var.region
 }
 
 module "ecs" {
@@ -24,3 +28,14 @@ module "ecs" {
 }
 
 data "aws_caller_identity" "current" {}
+
+terraform {
+  required_version = ">= 1.6.0"
+  required_providers { aws = { source = "hashicorp/aws", version = "~> 5.60" } }
+}
+
+provider "aws" { region = var.region }
+
+data "aws_caller_identity" "current" {}
+
+output "alb_dns" { value = module.network.alb_dns }
