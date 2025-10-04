@@ -32,6 +32,18 @@ variable "container_port" {
   default = 8000
 }
 
+variable "alb_sg_id" {
+  type        = string
+  default     = ""
+  description = "Existing ALB security group ID"
+}
+
+variable "tasks_sg_id" {
+  type        = string
+  default     = ""
+  description = "Existing ECS tasks security group ID"
+}
+
 variable "image_tag" {
   type        = string
   default     = "latest"
