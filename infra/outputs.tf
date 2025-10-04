@@ -32,6 +32,16 @@ output "log_group_name" {
   description = "CloudWatch log group name (null when network module is excluded from a targeted plan)"
 }
 
+output "alb_security_group_id" {
+  value       = try(module.network.alb_security_group_id, null)
+  description = "Security group ID associated with the Application Load Balancer (null when network module is excluded from a targeted plan)"
+}
+
+output "tasks_security_group_id" {
+  value       = try(module.network.tasks_security_group_id, null)
+  description = "Security group ID associated with the ECS tasks (null when network module is excluded from a targeted plan)"
+}
+
 output "tfstate_bucket" {
   value = "nickelth-tfstate"
 }

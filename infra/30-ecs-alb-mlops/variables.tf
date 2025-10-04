@@ -10,5 +10,20 @@ variable "ecr_repository_url" {
   description = "ECR repository URI, e.g. <ECR_REGISTRY>/mlops-sklearn-portfolio"
 }
 
-variable "alb_sg_id" { type = string } 
-variable "tasks_sg_id" { type = string }
+variable "alb_sg_id" {
+  type        = string
+  description = "Security group ID associated with the Application Load Balancer"
+  validation {
+    condition     = length(trim(var.alb_sg_id)) > 0
+    error_message = "alb_sg_id must be a non-empty security group ID. Provide an override or allow the network module to supply it."
+  }
+}
+
+variable "tasks_sg_id" {
+  type        = string
+  description = "Security group ID attached to the ECS tasks"
+  validation {
+    condition     = length(trim(var.tasks_sg_id)) > 0
+    error_message = "tasks_sg_id must be a non-empty security group ID. Provide an override or allow the network module to supply it."
+  }
+}

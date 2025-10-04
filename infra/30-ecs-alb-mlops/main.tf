@@ -21,14 +21,6 @@ data "aws_subnets" "default" {
     }
 }
 
-data "aws_security_group" "tasks" { 
-  id = var.tasks_sg_id 
-}
-
-data "aws_security_group" "alb" { 
-  id = var.alb_sg_id 
-}
-
 data "aws_lb_target_group" "api" { name = "mlops-api-tg" }
 data "aws_cloudwatch_log_group" "api" { name = "/mlops/api" }
 
@@ -97,7 +89,7 @@ resource "aws_ecs_service" "api" {
 
   network_configuration {
     subnets         = data.aws_subnets.default.ids
-    security_groups = [data.aws_security_group.tasks.id]
+    security_groups = [var.tasks_sg_id]
     assign_public_ip = true
   }
 
