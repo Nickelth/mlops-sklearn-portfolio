@@ -17,10 +17,8 @@ locals {
   image_uri = "${local.ecr_repo_uri}:${var.image_tag}"
 }
 
-# IAM ロールおよび関連ポリシーは Terraform 管理外で既に作成済みのものを利用する
-# （ロール重複エラー回避のため data ソース参照のみに統一）
-data "aws_iam_role" "task_execution" { name = "mlops-ecsTaskExecutionRole" }
-data "aws_iam_role" "task_role"      { name = "mlops-ecsTaskRole" }
+# IAM ロールは同一モジュール内の aws_iam_role リソースで作成する
+# （外部リソースへの依存を避ける）
 
 resource "aws_ecs_task_definition" "api" {
   family                   = "${var.project}-task"
@@ -29,8 +27,8 @@ resource "aws_ecs_task_definition" "api" {
   cpu                      = 256
   memory                   = 512
 
-  execution_role_arn       = data.aws_iam_role.task_execution.arn
-  task_role_arn            = data.aws_iam_role.task_role.arn
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
 
   container_definitions = jsonencode([
     {
