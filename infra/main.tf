@@ -1,5 +1,8 @@
 module "network" {
   source = "./00-network"
+  project = var.project
+  region  = var.region
+  # ここに VPC/Subnet 等の入力があれば渡す
 }
 
 module "ecr" {
@@ -21,14 +24,6 @@ module "ecs" {
   log_group_name = module.network.log_group_name
   image          = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.region}.amazonaws.com/mlops-sklearn-portfolio:latest"
   desired_count  = 1
-}
-
-// infra/main.tf （抜粋／例）
-module "network" {
-  source  = "./20-network"
-  project = var.project
-  region  = var.region
-  # ここに VPC/Subnet 等の入力があれば渡す
 }
 
 data "aws_caller_identity" "current" {}
