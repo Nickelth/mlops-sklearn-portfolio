@@ -27,4 +27,8 @@ RUN useradd -m appuser && mkdir -p /app/logs /app/models && chown -R appuser:app
 USER appuser
 
 EXPOSE 8000
+<<<<<<< HEAD
 CMD ["uvicorn","api.app:app","--host","0.0.0.x","--port","8000"]
+=======
+CMD ["uvicorn","api.app:app","--host","0.0.0.0","--port","8000"]
+>>>>>>> origin/feat_infra
