@@ -34,4 +34,7 @@ output "alb_arn" {
 }
 
 output "tasks_security_group_id" { value = aws_security_group.tasks.id }
-output "public_subnet_ids"       { value = [ for s in aws_subnet.public : s.id ] }
+output "public_subnet_ids" {
+  value       = data.aws_subnets.default.ids
+  description = "IDs of the default VPC subnets used by the ALB and ECS tasks"
+}
