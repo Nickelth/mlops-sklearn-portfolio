@@ -1,0 +1,1 @@
+arn:aws:ecs:us-west-2:438336773404:task-definition/mlops-sklearn-portfolio-task:4

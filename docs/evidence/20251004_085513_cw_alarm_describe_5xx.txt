@@ -1,0 +1,32 @@
+{
+    "MetricAlarms": [
+        {
+            "AlarmName": "mlops-api-alb-5xx-rate-gt1pct",
+            "AlarmArn": "arn:aws:cloudwatch:us-west-2:438336773404:alarm:mlops-api-alb-5xx-rate-gt1pct",
+            "AlarmConfigurationUpdatedTimestamp": "2025-10-04T08:55:16.751000+00:00",
+            "ActionsEnabled": true,
+            "OKActions": [],
+            "AlarmActions": [],
+            "InsufficientDataActions": [],
+            "StateValue": "INSUFFICIENT_DATA",
+            "StateReason": "Unchecked: Initial alarm creation",
+            "StateUpdatedTimestamp": "2025-10-04T08:55:16.751000+00:00",
+            "MetricName": "HTTPCode_ELB_5XX_Count",
+            "Namespace": "AWS/ApplicationELB",
+            "Statistic": "Sum",
+            "Dimensions": [
+                {
+                    "Name": "LoadBalancer",
+                    "Value": "app/mlops-api-alb/e48922b94a04da84"
+                }
+            ],
+            "Period": 300,
+            "EvaluationPeriods": 2,
+            "Threshold": 1.0,
+            "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+            "TreatMissingData": "notBreaching",
+            "StateTransitionedTimestamp": "2025-10-04T08:55:16.751000+00:00"
+        }
+    ],
+    "CompositeAlarms": []
+}

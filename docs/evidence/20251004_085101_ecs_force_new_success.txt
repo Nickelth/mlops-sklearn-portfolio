@@ -1,0 +1,180 @@
+{
+    "service": {
+        "serviceArn": "arn:aws:ecs:us-west-2:438336773404:service/mlops-api-cluster/mlops-api-svc",
+        "serviceName": "mlops-api-svc",
+        "clusterArn": "arn:aws:ecs:us-west-2:438336773404:cluster/mlops-api-cluster",
+        "loadBalancers": [
+            {
+                "targetGroupArn": "arn:aws:elasticloadbalancing:us-west-2:438336773404:targetgroup/mlops-api-tg/4eecab19de56b011",
+                "containerName": "api",
+                "containerPort": 8000
+            }
+        ],
+        "serviceRegistries": [],
+        "status": "ACTIVE",
+        "desiredCount": 1,
+        "runningCount": 1,
+        "pendingCount": 0,
+        "launchType": "FARGATE",
+        "platformVersion": "LATEST",
+        "platformFamily": "Linux",
+        "taskDefinition": "arn:aws:ecs:us-west-2:438336773404:task-definition/mlops-sklearn-portfolio-task:4",
+        "deploymentConfiguration": {
+            "deploymentCircuitBreaker": {
+                "enable": true,
+                "rollback": true
+            },
+            "maximumPercent": 200,
+            "minimumHealthyPercent": 100,
+            "strategy": "ROLLING",
+            "bakeTimeInMinutes": 0
+        },
+        "deployments": [
+            {
+                "id": "ecs-svc/5058790663746364598",
+                "status": "PRIMARY",
+                "taskDefinition": "arn:aws:ecs:us-west-2:438336773404:task-definition/mlops-sklearn-portfolio-task:4",
+                "desiredCount": 0,
+                "pendingCount": 0,
+                "runningCount": 0,
+                "failedTasks": 0,
+                "createdAt": "2025-10-04T08:51:14.790000+00:00",
+                "updatedAt": "2025-10-04T08:51:14.790000+00:00",
+                "launchType": "FARGATE",
+                "platformVersion": "1.4.0",
+                "platformFamily": "Linux",
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-0384561db8c07163c",
+                            "subnet-08326af247b075d10",
+                            "subnet-0d521901e37cb965e",
+                            "subnet-09d851ed375890f2d"
+                        ],
+                        "securityGroups": [
+                            "sg-0c2f455eb2ccdea5a"
+                        ],
+                        "assignPublicIp": "ENABLED"
+                    }
+                },
+                "rolloutState": "IN_PROGRESS",
+                "rolloutStateReason": "ECS deployment ecs-svc/5058790663746364598 in progress."
+            },
+            {
+                "id": "ecs-svc/9645557654575621394",
+                "status": "ACTIVE",
+                "taskDefinition": "arn:aws:ecs:us-west-2:438336773404:task-definition/mlops-sklearn-portfolio-task:4",
+                "desiredCount": 1,
+                "pendingCount": 0,
+                "runningCount": 1,
+                "failedTasks": 0,
+                "createdAt": "2025-10-04T08:45:26.839000+00:00",
+                "updatedAt": "2025-10-04T08:48:15.068000+00:00",
+                "launchType": "FARGATE",
+                "platformVersion": "1.4.0",
+                "platformFamily": "Linux",
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-0384561db8c07163c",
+                            "subnet-08326af247b075d10",
+                            "subnet-0d521901e37cb965e",
+                            "subnet-09d851ed375890f2d"
+                        ],
+                        "securityGroups": [
+                            "sg-0c2f455eb2ccdea5a"
+                        ],
+                        "assignPublicIp": "ENABLED"
+                    }
+                },
+                "rolloutState": "COMPLETED",
+                "rolloutStateReason": "ECS deployment ecs-svc/9645557654575621394 completed."
+            }
+        ],
+        "roleArn": "arn:aws:iam::438336773404:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+        "events": [
+            {
+                "id": "22b13695-f2d0-4f28-a8e9-70b4b156d133",
+                "createdAt": "2025-10-04T08:48:15.075000+00:00",
+                "message": "(service mlops-api-svc) has reached a steady state."
+            },
+            {
+                "id": "bee53422-9b75-4057-85ab-df8021936982",
+                "createdAt": "2025-10-04T08:48:15.074000+00:00",
+                "message": "(service mlops-api-svc) (deployment ecs-svc/9645557654575621394) deployment completed."
+            },
+            {
+                "id": "58392f8e-dc8d-4da2-8cef-0e1151e294ed",
+                "createdAt": "2025-10-04T08:47:14.213000+00:00",
+                "message": "(service mlops-api-svc, taskSet ecs-svc/2958395599790743136) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "85b6126d-8f2a-477e-afa8-aab4b45fd52d",
+                "createdAt": "2025-10-04T08:47:14.208000+00:00",
+                "message": "(service mlops-api-svc) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:438336773404:targetgroup/mlops-api-tg/4eecab19de56b011)"
+            },
+            {
+                "id": "f09e01c6-050f-4c81-bd45-d1f5f12c56de",
+                "createdAt": "2025-10-04T08:47:03.748000+00:00",
+                "message": "(service mlops-api-svc) has stopped 1 running tasks: (task fc4eaf2bf15b4fe3aed2f3d42504cf95)."
+            },
+            {
+                "id": "87f9dc8f-f2b6-4556-8ab7-dcc8028130ce",
+                "createdAt": "2025-10-04T08:46:13.512000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:438336773404:targetgroup/mlops-api-tg/4eecab19de56b011)"
+            },
+            {
+                "id": "f1347e5a-ae62-438c-ba9d-46d7aed17d43",
+                "createdAt": "2025-10-04T08:45:43.997000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task 0f15da8898f44d3e81558b4de07b5643)."
+            },
+            {
+                "id": "9776c9bc-8a6d-4b1c-9bbf-4dbb36a9e1cc",
+                "createdAt": "2025-10-04T08:14:13.028000+00:00",
+                "message": "(service mlops-api-svc) has reached a steady state."
+            },
+            {
+                "id": "f59d1c9e-471b-4ab2-afaa-a2a126a7cc41",
+                "createdAt": "2025-10-04T08:14:13.027000+00:00",
+                "message": "(service mlops-api-svc) (deployment ecs-svc/2958395599790743136) deployment completed."
+            },
+            {
+                "id": "e9dd0a6a-b69b-4654-98a3-3c9ffc4da60f",
+                "createdAt": "2025-10-04T08:13:32.632000+00:00",
+                "message": "(service mlops-api-svc) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-west-2:438336773404:targetgroup/mlops-api-tg/4eecab19de56b011)"
+            },
+            {
+                "id": "66af015b-1b9e-41c4-846a-d380e57443e6",
+                "createdAt": "2025-10-04T08:13:02.282000+00:00",
+                "message": "(service mlops-api-svc) has started 1 tasks: (task fc4eaf2bf15b4fe3aed2f3d42504cf95)."
+            }
+        ],
+        "createdAt": "2025-10-04T08:12:49.881000+00:00",
+        "placementConstraints": [],
+        "placementStrategy": [],
+        "networkConfiguration": {
+            "awsvpcConfiguration": {
+                "subnets": [
+                    "subnet-0384561db8c07163c",
+                    "subnet-08326af247b075d10",
+                    "subnet-0d521901e37cb965e",
+                    "subnet-09d851ed375890f2d"
+                ],
+                "securityGroups": [
+                    "sg-0c2f455eb2ccdea5a"
+                ],
+                "assignPublicIp": "ENABLED"
+            }
+        },
+        "healthCheckGracePeriodSeconds": 60,
+        "schedulingStrategy": "REPLICA",
+        "deploymentController": {
+            "type": "ECS"
+        },
+        "createdBy": "arn:aws:iam::438336773404:root",
+        "enableECSManagedTags": false,
+        "propagateTags": "SERVICE",
+        "enableExecuteCommand": false,
+        "availabilityZoneRebalancing": "DISABLED"
+    }
+}
