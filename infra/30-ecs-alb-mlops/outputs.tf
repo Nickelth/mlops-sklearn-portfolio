@@ -22,3 +22,13 @@ output "image_uri" {
   value       = try(local.image_uri, null)
   description = "Container image URI used by the ECS task (null when image URI cannot be resolved)"
 }
+
+output "alb_security_group_id" {
+  value       = var.alb_sg_id
+  description = "Security group ID associated with the Application Load Balancer"
+}
+
+output "tasks_security_group_id" {
+  value       = var.tasks_sg_id
+  description = "Security group ID associated with the ECS tasks"
+}
