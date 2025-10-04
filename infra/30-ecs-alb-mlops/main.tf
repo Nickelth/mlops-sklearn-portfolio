@@ -21,18 +21,12 @@ data "aws_subnets" "default" {
     }
 }
 
-# 既存の SG/TG/LogGroup は “名前” で引く
 data "aws_security_group" "tasks" { 
-    filter { 
-        name="group-name" 
-        values=[var.tasks_sg_id] 
-    } 
+  id = var.tasks_sg_id 
 }
-data "aws_security_group" "alb"   { 
-    filter { 
-        name="group-name" 
-        values=[var.alb_sg_id] 
-    } 
+
+data "aws_security_group" "alb" { 
+  id = var.alb_sg_id 
 }
 
 data "aws_lb_target_group" "api" { name = "mlops-api-tg" }
