@@ -25,13 +25,13 @@ data "aws_subnets" "default" {
 data "aws_security_group" "tasks" { 
     filter { 
         name="group-name" 
-        values=["mlops-ecs-tasks"] 
+        values=[var.tasks_sg_id] 
     } 
 }
 data "aws_security_group" "alb"   { 
     filter { 
         name="group-name" 
-        values=["mlops-alb"] 
+        values=[var.alb_sg_id] 
     } 
 }
 
