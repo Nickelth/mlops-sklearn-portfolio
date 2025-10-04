@@ -13,5 +13,7 @@ module "ecs" {
   ecr_repo       = var.ecr_repo
   image_tag      = var.image_tag
   container_port = var.container_port
+  alb_sg_id      = var.alb_sg_id
+  tasks_sg_id    = var.tasks_sg_id
 }
 
