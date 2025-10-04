@@ -8,3 +8,7 @@ variable "force_destroy" {
   default     = false
   description = "Allow bucket force destroy (dev only; usually false)"
 }
+
+variable "project"     { type = string }
+variable "region"      { type = string }
+variable "bucket_name" { type = string }
