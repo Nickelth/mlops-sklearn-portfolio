@@ -39,7 +39,8 @@ locals {
   image_uri = "${local.ecr_repo_uri}:${var.image_tag}"
 }
 
-# IAM ロールは既存名前でdata参照（作成は 9/15 で済んでいる想定）
+# IAM ロールおよび関連ポリシーは Terraform 管理外で既に作成済みのものを利用する
+# （ロール重複エラー回避のため data ソース参照のみに統一）
 data "aws_iam_role" "task_execution" { name = "mlops-ecsTaskExecutionRole" }
 data "aws_iam_role" "task_role"      { name = "mlops-ecsTaskRole" }
 
