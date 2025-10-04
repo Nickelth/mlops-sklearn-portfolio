@@ -12,9 +12,14 @@ output "region" {
   value = var.region
 }
 
+output "alb_dns" {
+  value       = try(module.network.alb_dns, try(module.network.alb_dns_name, null))
+  description = "Application Load Balancer DNS name (null when network module is excluded from a targeted plan)"
+}
+
 output "alb_dns_name" {
   value       = try(module.network.alb_dns_name, null)
-  description = "Application Load Balancer DNS name (null when network module is excluded from a targeted plan)"
+  description = "Application Load Balancer DNS name (deprecated; prefer alb_dns)"
 }
 
 output "alb_arn" {
