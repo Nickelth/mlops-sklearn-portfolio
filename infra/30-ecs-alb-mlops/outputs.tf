@@ -32,3 +32,6 @@ output "tasks_security_group_id" {
   value       = var.tasks_sg_id
   description = "Security group ID associated with the ECS tasks"
 }
+
+output "ecs_cluster_arn" { value = aws_ecs_cluster.this.arn }
+output "taskdef_arn"     { value = aws_ecs_task_definition.api.arn }
