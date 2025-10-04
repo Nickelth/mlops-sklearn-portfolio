@@ -29,7 +29,6 @@ variable "tasks_sg_id" {
 }
 
 variable "region"        { type = string }
-variable "project"       { type = string }
 
 # network モジュールから渡す
 variable "tg_arn"        { type = string }
