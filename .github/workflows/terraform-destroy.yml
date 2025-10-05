@@ -49,6 +49,7 @@ jobs:
           ECR_REPO: ${{ vars.ECR_REPO }}
         run: |
           set -euo pipefail
+          terraform -chdir=/tmp/infra init -reconfigure
           ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
           TF_VARS=(
             "-var=region=${AWS_REGION}"
