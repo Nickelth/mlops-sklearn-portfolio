@@ -1,0 +1,87 @@
+name: Terraform Destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type DESTROY to confirm"
+        required: true
+        default: ""
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: terraform
+  cancel-in-progress: false
+
+jobs:
+  destroy:
+    if: github.event.inputs.confirm != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    # environment: terraform
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: terraform-destroy
+
+      - name: Prepare Terraform workspace
+        run: make prep
+
+      - name: Terraform plan (destroy)
+        id: tf_plan
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+          ECR_REPO: ${{ vars.ECR_REPO }}
+        run: |
+          set -euo pipefail
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          TF_VARS=(
+            "-var=region=${AWS_REGION}"
+            "-var=bucket_name=${S3_BUCKET_NAME}"
+            "-var=ecr_repository_url=${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}"
+          )
+          terraform -chdir=/tmp/infra plan -destroy -out=tfplan "${TF_VARS[@]}"
+          terraform -chdir=/tmp/infra show -no-color tfplan > tfplan.txt
+
+      - name: Upload destroy plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-destroy-plan
+          path: |
+            tfplan
+            tfplan.txt
+
+      - name: Require explicit confirmation
+        if: github.event.inputs.confirm != 'DESTROY'
+        run: |
+          echo "Confirmation input must be DESTROY"
+          exit 1
+
+      - name: Terraform destroy
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+          ECR_REPO: ${{ vars.ECR_REPO }}
+        run: |
+          set -euo pipefail
+          make tf-destroy AWS_REGION="${AWS_REGION}" S3_BUCKET_NAME="${S3_BUCKET_NAME}" REPO_NAME="${ECR_REPO}"
+
+      - name: Clean workspace
+        if: always()
+        run: make clean-tmp
+

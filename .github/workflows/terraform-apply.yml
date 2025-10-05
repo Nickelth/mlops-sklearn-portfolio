@@ -1,0 +1,276 @@
+name: Terraform Apply
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type APPLY to run terraform apply"
+        required: true
+        default: ""
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: terraform
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: github.event.inputs.confirm != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # environment: terraform
+    outputs:
+      alb_dns: ${{ steps.tf_outputs.outputs.alb_dns }}
+      alb_dns_name: ${{ steps.tf_outputs.outputs.alb_dns_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: terraform-apply
+
+      - name: Prepare Terraform workspace
+        run: make prep
+
+      - name: Terraform init
+        run: make tf-init
+
+      - name: Terraform plan
+        id: tf_plan
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+          ECR_REPO: ${{ vars.ECR_REPO }}
+        run: |
+          set -euo pipefail
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          TF_VARS=(
+            "-var=region=${AWS_REGION}"
+            "-var=bucket_name=${S3_BUCKET_NAME}"
+            "-var=ecr_repository_url=${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}"
+          )
+          terraform -chdir=/tmp/infra plan -out=plan.tfplan "${TF_VARS[@]}"
+          terraform -chdir=/tmp/infra show -no-color plan.tfplan > plan.txt
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-apply-plan
+          path: |
+            plan.tfplan
+            plan.txt
+
+      - name: Require explicit confirmation
+        if: github.event.inputs.confirm != 'APPLY'
+        run: |
+          echo "Confirmation input must be APPLY"
+          exit 1
+
+      - name: Terraform apply
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+          ECR_REPO: ${{ vars.ECR_REPO }}
+        run: |
+          set -euo pipefail
+          make tf-apply AWS_REGION="${AWS_REGION}" S3_BUCKET_NAME="${S3_BUCKET_NAME}" REPO_NAME="${ECR_REPO}"
+
+      - name: Capture Terraform outputs
+        id: tf_outputs
+        run: |
+          set -euo pipefail
+          terraform -chdir=/tmp/infra output -json > tf-outputs.json
+          jq -r '.alb_dns.value' tf-outputs.json > alb_dns.txt
+          jq -r '.alb_dns_name.value' tf-outputs.json > alb_dns_name.txt
+          echo "alb_dns=$(cat alb_dns.txt)" >> "$GITHUB_OUTPUT"
+          echo "alb_dns_name=$(cat alb_dns_name.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke test /healthz
+        env:
+          ALB_DNS: ${{ steps.tf_outputs.outputs.alb_dns_name }}
+        run: |
+          set -euo pipefail
+          echo "Target ALB DNS: ${ALB_DNS}" | tee healthz_target.txt
+          : > response.txt
+          for i in $(seq 1 30); do
+            HTTP_CODE=$(curl -sS -o response.txt -w "%{http_code}" --max-time 10 "http://${ALB_DNS}/healthz" || echo 000)
+            if [[ "$HTTP_CODE" == "200" ]]; then
+              echo "HTTP $HTTP_CODE" | tee healthz_status.txt
+              cat response.txt
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "ALB did not return HTTP 200 on /healthz within timeout" | tee healthz_status.txt
+          cat response.txt >&2 || true
+          exit 1
+
+      - name: Upload smoke artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-apply-evidence
+          path: |
+            tf-outputs.json
+            alb_dns.txt
+            alb_dns_name.txt
+            healthz_target.txt
+            healthz_status.txt
+            response.txt
+
+      - name: Clean workspace
+        if: always()
+        run: make clean-tmp
+
+  plan-zero:
+    needs: apply
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: terraform-plan-zero
+
+      - name: Prepare Terraform workspace
+        run: make prep
+
+      - name: Terraform init
+        run: make tf-init
+
+      - name: Terraform plan (expect zero diff)
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          S3_BUCKET_NAME: ${{ vars.S3_BUCKET_NAME }}
+          ECR_REPO: ${{ vars.ECR_REPO }}
+        run: |
+          set -euo pipefail
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          TF_VARS=(
+            "-var=region=${AWS_REGION}"
+            "-var=bucket_name=${S3_BUCKET_NAME}"
+            "-var=ecr_repository_url=${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO}"
+          )
+          if terraform -chdir=/tmp/infra plan -detailed-exitcode -out=drift.tfplan "${TF_VARS[@]}"; then
+            echo "No drift detected"
+          else
+            status=$?
+            terraform -chdir=/tmp/infra show -no-color drift.tfplan > drift.txt || true
+            cat drift.txt || true
+            exit $status
+          fi
+
+      - name: Upload drift artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan-drift
+          path: |
+            drift.tfplan
+            drift.txt
+
+      - name: Clean workspace
+        if: always()
+        run: make clean-tmp
+
+  terratest:
+    needs: apply
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: terraform-terratest
+
+      - name: Install dependencies
+        run: go mod download
+        working-directory: infra/tests
+
+      - name: Run Terratest suite
+        run: go test ./... -timeout 20m -v
+        working-directory: infra/tests
+
+      - name: Upload Terratest reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terratest-logs
+          path: infra/tests/testdata
+          if-no-files-found: warn
+
+  policy:
+    needs: apply
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Checkov
+        run: |
+          python -m pip install -U pip
+          pip install checkov
+
+      - name: Run Checkov
+        run: |
+          set -euo pipefail
+          checkov -d infra --framework terraform --compact --quiet --skip-download --output json > checkov-report.json
+          jq . checkov-report.json > checkov-report.pretty.json
+
+      - name: Set up OPA
+        uses: open-policy-agent/setup-opa@v1
+
+      - name: Install Conftest
+        run: npm install -g @open-policy-agent/conftest
+
+      - name: Run Conftest policies
+        run: |
+          conftest test infra --policy policy --all-namespaces
+
+      - name: Upload policy artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: policy-reports
+          path: |
+            checkov-report.json
+            checkov-report.pretty.json
