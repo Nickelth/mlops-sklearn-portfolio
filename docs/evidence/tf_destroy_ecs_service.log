@@ -1,0 +1,112 @@
+[0m[1mvar.bucket_name[0m
+  Global-unique S3 bucket name for artifacts/models/logs
+
+  [1mEnter a value:[0m [0m
+[0m[1mmodule.ecs.data.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_cloudwatch_log_group.api: Reading...[0m[0m
+[0m[1mmodule.network.data.aws_vpc.default: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_iam_policy_document.ecs_task_assume: Reading...[0m[0m
+[0m[1mmodule.ecs.data.aws_vpc.default: Reading...[0m[0m
+[0m[1mmodule.ecs.aws_ecs_cluster.this: Refreshing state... [id=arn:aws:ecs:us-west-2:438336773404:cluster/mlops-api-cluster][0m
+[0m[1mmodule.ecs.data.aws_iam_policy_document.ecs_task_assume: Read complete after 0s [id=1077804475][0m
+[0m[1mmodule.ecs.aws_iam_role.ecs_task_role: Refreshing state... [id=mlops-ecsTaskRole][0m
+[0m[1mmodule.ecs.aws_iam_role.ecs_task_execution: Refreshing state... [id=mlops-ecsTaskExecutionRole][0m
+[0m[1mmodule.ecs.data.aws_caller_identity.current: Read complete after 0s [id=438336773404][0m
+[0m[1mmodule.ecs.data.aws_cloudwatch_log_group.api: Read complete after 0s [id=/mlops/api][0m
+[0m[1mmodule.network.data.aws_vpc.default: Read complete after 0s [id=vpc-0fbda65c351254bb3][0m
+[0m[1mmodule.ecs.data.aws_vpc.default: Read complete after 0s [id=vpc-0fbda65c351254bb3][0m
+[0m[1mmodule.network.aws_security_group.tasks: Refreshing state... [id=sg-0c2f455eb2ccdea5a][0m
+[0m[1mmodule.ecs.data.aws_subnets.default: Reading...[0m[0m
+[0m[1mmodule.network.aws_lb_target_group.api: Refreshing state... [id=arn:aws:elasticloadbalancing:us-west-2:438336773404:targetgroup/mlops-api-tg/4eecab19de56b011][0m
+[0m[1mmodule.ecs.aws_ecs_task_definition.api: Refreshing state... [id=mlops-sklearn-portfolio-task][0m
+[0m[1mmodule.ecs.data.aws_subnets.default: Read complete after 0s [id=us-west-2][0m
+[0m[1mmodule.ecs.aws_ecs_service.api: Refreshing state... [id=arn:aws:ecs:us-west-2:438336773404:service/mlops-api-cluster/mlops-api-svc][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [31m-[0m destroy[0m
+
+Terraform will perform the following actions:
+
+[1m  # module.ecs.aws_ecs_service.api[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_ecs_service" "api" {
+      [31m-[0m[0m availability_zone_rebalancing      = "DISABLED" [90m-> null[0m[0m
+      [31m-[0m[0m cluster                            = "arn:aws:ecs:us-west-2:438336773404:cluster/mlops-api-cluster" [90m-> null[0m[0m
+      [31m-[0m[0m deployment_maximum_percent         = 200 [90m-> null[0m[0m
+      [31m-[0m[0m deployment_minimum_healthy_percent = 100 [90m-> null[0m[0m
+      [31m-[0m[0m desired_count                      = 0 [90m-> null[0m[0m
+      [31m-[0m[0m enable_ecs_managed_tags            = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_execute_command             = false [90m-> null[0m[0m
+      [31m-[0m[0m health_check_grace_period_seconds  = 60 [90m-> null[0m[0m
+      [31m-[0m[0m iam_role                           = "/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS" [90m-> null[0m[0m
+      [31m-[0m[0m id                                 = "arn:aws:ecs:us-west-2:438336773404:service/mlops-api-cluster/mlops-api-svc" [90m-> null[0m[0m
+      [31m-[0m[0m launch_type                        = "FARGATE" [90m-> null[0m[0m
+      [31m-[0m[0m name                               = "mlops-api-svc" [90m-> null[0m[0m
+      [31m-[0m[0m platform_version                   = "1.4.0" [90m-> null[0m[0m
+      [31m-[0m[0m propagate_tags                     = "SERVICE" [90m-> null[0m[0m
+      [31m-[0m[0m scheduling_strategy                = "REPLICA" [90m-> null[0m[0m
+      [31m-[0m[0m tags                               = {
+          [31m-[0m[0m "Project" = "mlops-sklearn-portfolio"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                           = {
+          [31m-[0m[0m "Env"     = "dev"
+          [31m-[0m[0m "Managed" = "terraform"
+          [31m-[0m[0m "Project" = "mlops-sklearn-portfolio"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m task_definition                    = "arn:aws:ecs:us-west-2:438336773404:task-definition/mlops-sklearn-portfolio-task:4" [90m-> null[0m[0m
+      [31m-[0m[0m triggers                           = {} [90m-> null[0m[0m
+      [31m-[0m[0m wait_for_steady_state              = false [90m-> null[0m[0m
+
+      [31m-[0m[0m deployment_circuit_breaker {
+          [31m-[0m[0m enable   = true [90m-> null[0m[0m
+          [31m-[0m[0m rollback = true [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m deployment_controller {
+          [31m-[0m[0m type = "ECS" [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m load_balancer {
+          [31m-[0m[0m container_name   = "api" [90m-> null[0m[0m
+          [31m-[0m[0m container_port   = 8000 [90m-> null[0m[0m
+          [31m-[0m[0m target_group_arn = "arn:aws:elasticloadbalancing:us-west-2:438336773404:targetgroup/mlops-api-tg/4eecab19de56b011" [90m-> null[0m[0m
+            [90m# (1 unchanged attribute hidden)[0m[0m
+        }
+
+      [31m-[0m[0m network_configuration {
+          [31m-[0m[0m assign_public_ip = true [90m-> null[0m[0m
+          [31m-[0m[0m security_groups  = [
+              [31m-[0m[0m "sg-0c2f455eb2ccdea5a",
+            ] [90m-> null[0m[0m
+          [31m-[0m[0m subnets          = [
+              [31m-[0m[0m "subnet-0384561db8c07163c",
+              [31m-[0m[0m "subnet-08326af247b075d10",
+              [31m-[0m[0m "subnet-09d851ed375890f2d",
+              [31m-[0m[0m "subnet-0d521901e37cb965e",
+            ] [90m-> null[0m[0m
+        }
+    }
+
+[1mPlan:[0m 0 to add, 0 to change, 1 to destroy.
+[0m[0m[1mmodule.ecs.aws_ecs_service.api: Destroying... [id=arn:aws:ecs:us-west-2:438336773404:service/mlops-api-cluster/mlops-api-svc][0m[0m
+[0m[1mmodule.ecs.aws_ecs_service.api: Still destroying... [id=arn:aws:ecs:us-west-2:438336773404:service/mlops-api-cluster/mlops-api-svc, 00m10s elapsed][0m[0m
+[0m[1mmodule.ecs.aws_ecs_service.api: Still destroying... [id=arn:aws:ecs:us-west-2:438336773404:service/mlops-api-cluster/mlops-api-svc, 00m20s elapsed][0m[0m
+[0m[1mmodule.ecs.aws_ecs_service.api: Destruction complete after 26s[0m
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mResource targeting is in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mYou are creating a plan with the -target option, which means that the result of this plan may not represent all of the changes requested by the current configuration.
+[33m│[0m [0m
+[33m│[0m [0mThe -target option is not for routine use, and is provided only for exceptional situations such as recovering from errors or mistakes, or when Terraform specifically suggests to use it as part of an error message.
+[33m╵[0m[0m
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mApplied changes may be incomplete[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe plan was created with the -target option in effect, so some changes requested in the configuration may have been ignored and the output values may not be fully updated. Run the following command to verify that no other changes are pending:
+[33m│[0m [0m    terraform plan
+[33m│[0m [0m
+[33m│[0m [0mNote that the -target option is not suitable for routine use, and is provided only for exceptional situations such as recovering from errors or mistakes, or when Terraform specifically suggests to use it as part of an error message.
+[33m╵[0m[0m
+[0m[1m[32m
+Destroy complete! Resources: 1 destroyed.
+[0m

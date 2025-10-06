@@ -1,0 +1,110 @@
+[0m[1mvar.bucket_name[0m
+  Global-unique S3 bucket name for artifacts/models/logs
+
+  [1mEnter a value:[0m [0m
+[0m[1mmodule.network.data.aws_vpc.default: Reading...[0m[0m
+[0m[1mmodule.network.data.aws_vpc.default: Read complete after 1s [id=vpc-0fbda65c351254bb3][0m
+[0m[1mmodule.network.data.aws_subnets.default: Reading...[0m[0m
+[0m[1mmodule.network.aws_security_group.alb: Refreshing state... [id=sg-05d99b7865dd3fa50][0m
+[0m[1mmodule.network.data.aws_subnets.default: Read complete after 0s [id=us-west-2][0m
+[0m[1mmodule.network.aws_lb.api: Refreshing state... [id=arn:aws:elasticloadbalancing:us-west-2:438336773404:loadbalancer/app/mlops-api-alb/e48922b94a04da84][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [31m-[0m destroy[0m
+
+Terraform will perform the following actions:
+
+[1m  # module.network.aws_lb.api[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_lb" "api" {
+      [31m-[0m[0m arn                                                          = "arn:aws:elasticloadbalancing:us-west-2:438336773404:loadbalancer/app/mlops-api-alb/e48922b94a04da84" [90m-> null[0m[0m
+      [31m-[0m[0m arn_suffix                                                   = "app/mlops-api-alb/e48922b94a04da84" [90m-> null[0m[0m
+      [31m-[0m[0m client_keep_alive                                            = 3600 [90m-> null[0m[0m
+      [31m-[0m[0m desync_mitigation_mode                                       = "defensive" [90m-> null[0m[0m
+      [31m-[0m[0m dns_name                                                     = "mlops-api-alb-580667902.us-west-2.elb.amazonaws.com" [90m-> null[0m[0m
+      [31m-[0m[0m drop_invalid_header_fields                                   = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_cross_zone_load_balancing                             = true [90m-> null[0m[0m
+      [31m-[0m[0m enable_deletion_protection                                   = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_http2                                                 = true [90m-> null[0m[0m
+      [31m-[0m[0m enable_tls_version_and_cipher_suite_headers                  = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_waf_fail_open                                         = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_xff_client_port                                       = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_zonal_shift                                           = false [90m-> null[0m[0m
+      [31m-[0m[0m id                                                           = "arn:aws:elasticloadbalancing:us-west-2:438336773404:loadbalancer/app/mlops-api-alb/e48922b94a04da84" [90m-> null[0m[0m
+      [31m-[0m[0m idle_timeout                                                 = 60 [90m-> null[0m[0m
+      [31m-[0m[0m internal                                                     = false [90m-> null[0m[0m
+      [31m-[0m[0m ip_address_type                                              = "ipv4" [90m-> null[0m[0m
+      [31m-[0m[0m load_balancer_type                                           = "application" [90m-> null[0m[0m
+      [31m-[0m[0m name                                                         = "mlops-api-alb" [90m-> null[0m[0m
+      [31m-[0m[0m preserve_host_header                                         = false [90m-> null[0m[0m
+      [31m-[0m[0m security_groups                                              = [
+          [31m-[0m[0m "sg-05d99b7865dd3fa50",
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m subnets                                                      = [
+          [31m-[0m[0m "subnet-0384561db8c07163c",
+          [31m-[0m[0m "subnet-08326af247b075d10",
+          [31m-[0m[0m "subnet-09d851ed375890f2d",
+          [31m-[0m[0m "subnet-0d521901e37cb965e",
+        ] [90m-> null[0m[0m
+      [31m-[0m[0m tags                                                         = {
+          [31m-[0m[0m "Project" = "mlops-sklearn-portfolio"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                                                     = {
+          [31m-[0m[0m "Env"     = "dev"
+          [31m-[0m[0m "Managed" = "terraform"
+          [31m-[0m[0m "Project" = "mlops-sklearn-portfolio"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id                                                       = "vpc-0fbda65c351254bb3" [90m-> null[0m[0m
+      [31m-[0m[0m xff_header_processing_mode                                   = "append" [90m-> null[0m[0m
+      [31m-[0m[0m zone_id                                                      = "Z1H1FL5HABSF5" [90m-> null[0m[0m
+        [90m# (3 unchanged attributes hidden)[0m[0m
+
+      [31m-[0m[0m access_logs {
+          [31m-[0m[0m enabled = false [90m-> null[0m[0m
+            [90m# (2 unchanged attributes hidden)[0m[0m
+        }
+
+      [31m-[0m[0m connection_logs {
+          [31m-[0m[0m enabled = false [90m-> null[0m[0m
+            [90m# (2 unchanged attributes hidden)[0m[0m
+        }
+
+      [31m-[0m[0m subnet_mapping {
+          [31m-[0m[0m subnet_id            = "subnet-0384561db8c07163c" [90m-> null[0m[0m
+            [90m# (4 unchanged attributes hidden)[0m[0m
+        }
+      [31m-[0m[0m subnet_mapping {
+          [31m-[0m[0m subnet_id            = "subnet-08326af247b075d10" [90m-> null[0m[0m
+            [90m# (4 unchanged attributes hidden)[0m[0m
+        }
+      [31m-[0m[0m subnet_mapping {
+          [31m-[0m[0m subnet_id            = "subnet-09d851ed375890f2d" [90m-> null[0m[0m
+            [90m# (4 unchanged attributes hidden)[0m[0m
+        }
+      [31m-[0m[0m subnet_mapping {
+          [31m-[0m[0m subnet_id            = "subnet-0d521901e37cb965e" [90m-> null[0m[0m
+            [90m# (4 unchanged attributes hidden)[0m[0m
+        }
+    }
+
+[1mPlan:[0m 0 to add, 0 to change, 1 to destroy.
+[0m[0m[1mmodule.network.aws_lb.api: Destroying... [id=arn:aws:elasticloadbalancing:us-west-2:438336773404:loadbalancer/app/mlops-api-alb/e48922b94a04da84][0m[0m
+[0m[1mmodule.network.aws_lb.api: Destruction complete after 8s[0m
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mResource targeting is in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mYou are creating a plan with the -target option, which means that the result of this plan may not represent all of the changes requested by the current configuration.
+[33m│[0m [0m
+[33m│[0m [0mThe -target option is not for routine use, and is provided only for exceptional situations such as recovering from errors or mistakes, or when Terraform specifically suggests to use it as part of an error message.
+[33m╵[0m[0m
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mApplied changes may be incomplete[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe plan was created with the -target option in effect, so some changes requested in the configuration may have been ignored and the output values may not be fully updated. Run the following command to verify that no other changes are pending:
+[33m│[0m [0m    terraform plan
+[33m│[0m [0m
+[33m│[0m [0mNote that the -target option is not suitable for routine use, and is provided only for exceptional situations such as recovering from errors or mistakes, or when Terraform specifically suggests to use it as part of an error message.
+[33m╵[0m[0m
+[0m[1m[32m
+Destroy complete! Resources: 1 destroyed.
+[0m

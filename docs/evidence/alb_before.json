@@ -1,0 +1,44 @@
+{
+    "LoadBalancers": [
+        {
+            "LoadBalancerArn": "arn:aws:elasticloadbalancing:us-west-2:438336773404:loadbalancer/app/mlops-api-alb/e48922b94a04da84",
+            "DNSName": "mlops-api-alb-580667902.us-west-2.elb.amazonaws.com",
+            "CanonicalHostedZoneId": "Z1H1FL5HABSF5",
+            "CreatedTime": "2025-10-04T06:03:07.563000+00:00",
+            "LoadBalancerName": "mlops-api-alb",
+            "Scheme": "internet-facing",
+            "VpcId": "vpc-0fbda65c351254bb3",
+            "State": {
+                "Code": "active"
+            },
+            "Type": "application",
+            "AvailabilityZones": [
+                {
+                    "ZoneName": "us-west-2d",
+                    "SubnetId": "subnet-0384561db8c07163c",
+                    "LoadBalancerAddresses": []
+                },
+                {
+                    "ZoneName": "us-west-2a",
+                    "SubnetId": "subnet-08326af247b075d10",
+                    "LoadBalancerAddresses": []
+                },
+                {
+                    "ZoneName": "us-west-2c",
+                    "SubnetId": "subnet-09d851ed375890f2d",
+                    "LoadBalancerAddresses": []
+                },
+                {
+                    "ZoneName": "us-west-2b",
+                    "SubnetId": "subnet-0d521901e37cb965e",
+                    "LoadBalancerAddresses": []
+                }
+            ],
+            "SecurityGroups": [
+                "sg-05d99b7865dd3fa50"
+            ],
+            "IpAddressType": "ipv4",
+            "EnablePrefixForIpv6SourceNat": "off"
+        }
+    ]
+}

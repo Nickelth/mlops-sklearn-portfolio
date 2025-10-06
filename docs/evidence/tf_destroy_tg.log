@@ -1,0 +1,100 @@
+[0m[1mvar.bucket_name[0m
+  Global-unique S3 bucket name for artifacts/models/logs
+
+  [1mEnter a value:[0m [0m
+[0m[1mmodule.network.data.aws_vpc.default: Reading...[0m[0m
+[0m[1mmodule.network.data.aws_vpc.default: Read complete after 0s [id=vpc-0fbda65c351254bb3][0m
+[0m[1mmodule.network.aws_lb_target_group.api: Refreshing state... [id=arn:aws:elasticloadbalancing:us-west-2:438336773404:targetgroup/mlops-api-tg/4eecab19de56b011][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [31m-[0m destroy[0m
+
+Terraform will perform the following actions:
+
+[1m  # module.network.aws_lb_target_group.api[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "aws_lb_target_group" "api" {
+      [31m-[0m[0m arn                                = "arn:aws:elasticloadbalancing:us-west-2:438336773404:targetgroup/mlops-api-tg/4eecab19de56b011" [90m-> null[0m[0m
+      [31m-[0m[0m arn_suffix                         = "targetgroup/mlops-api-tg/4eecab19de56b011" [90m-> null[0m[0m
+      [31m-[0m[0m deregistration_delay               = "300" [90m-> null[0m[0m
+      [31m-[0m[0m id                                 = "arn:aws:elasticloadbalancing:us-west-2:438336773404:targetgroup/mlops-api-tg/4eecab19de56b011" [90m-> null[0m[0m
+      [31m-[0m[0m ip_address_type                    = "ipv4" [90m-> null[0m[0m
+      [31m-[0m[0m lambda_multi_value_headers_enabled = false [90m-> null[0m[0m
+      [31m-[0m[0m load_balancer_arns                 = [] [90m-> null[0m[0m
+      [31m-[0m[0m load_balancing_algorithm_type      = "round_robin" [90m-> null[0m[0m
+      [31m-[0m[0m load_balancing_anomaly_mitigation  = "off" [90m-> null[0m[0m
+      [31m-[0m[0m load_balancing_cross_zone_enabled  = "use_load_balancer_configuration" [90m-> null[0m[0m
+      [31m-[0m[0m name                               = "mlops-api-tg" [90m-> null[0m[0m
+      [31m-[0m[0m port                               = 8000 [90m-> null[0m[0m
+      [31m-[0m[0m protocol                           = "HTTP" [90m-> null[0m[0m
+      [31m-[0m[0m protocol_version                   = "HTTP1" [90m-> null[0m[0m
+      [31m-[0m[0m proxy_protocol_v2                  = false [90m-> null[0m[0m
+      [31m-[0m[0m slow_start                         = 0 [90m-> null[0m[0m
+      [31m-[0m[0m tags                               = {
+          [31m-[0m[0m "Project" = "mlops-sklearn-portfolio"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                           = {
+          [31m-[0m[0m "Env"     = "dev"
+          [31m-[0m[0m "Managed" = "terraform"
+          [31m-[0m[0m "Project" = "mlops-sklearn-portfolio"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m target_type                        = "ip" [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id                             = "vpc-0fbda65c351254bb3" [90m-> null[0m[0m
+        [90m# (1 unchanged attribute hidden)[0m[0m
+
+      [31m-[0m[0m health_check {
+          [31m-[0m[0m enabled             = true [90m-> null[0m[0m
+          [31m-[0m[0m healthy_threshold   = 2 [90m-> null[0m[0m
+          [31m-[0m[0m interval            = 30 [90m-> null[0m[0m
+          [31m-[0m[0m matcher             = "200-399" [90m-> null[0m[0m
+          [31m-[0m[0m path                = "/health" [90m-> null[0m[0m
+          [31m-[0m[0m port                = "traffic-port" [90m-> null[0m[0m
+          [31m-[0m[0m protocol            = "HTTP" [90m-> null[0m[0m
+          [31m-[0m[0m timeout             = 5 [90m-> null[0m[0m
+          [31m-[0m[0m unhealthy_threshold = 2 [90m-> null[0m[0m
+        }
+
+      [31m-[0m[0m stickiness {
+          [31m-[0m[0m cookie_duration = 86400 [90m-> null[0m[0m
+          [31m-[0m[0m enabled         = false [90m-> null[0m[0m
+          [31m-[0m[0m type            = "lb_cookie" [90m-> null[0m[0m
+            [90m# (1 unchanged attribute hidden)[0m[0m
+        }
+
+      [31m-[0m[0m target_failover {}
+
+      [31m-[0m[0m target_group_health {
+          [31m-[0m[0m dns_failover {
+              [31m-[0m[0m minimum_healthy_targets_count      = "1" [90m-> null[0m[0m
+              [31m-[0m[0m minimum_healthy_targets_percentage = "off" [90m-> null[0m[0m
+            }
+          [31m-[0m[0m unhealthy_state_routing {
+              [31m-[0m[0m minimum_healthy_targets_count      = 1 [90m-> null[0m[0m
+              [31m-[0m[0m minimum_healthy_targets_percentage = "off" [90m-> null[0m[0m
+            }
+        }
+
+      [31m-[0m[0m target_health_state {}
+    }
+
+[1mPlan:[0m 0 to add, 0 to change, 1 to destroy.
+[0m[0m[1mmodule.network.aws_lb_target_group.api: Destroying... [id=arn:aws:elasticloadbalancing:us-west-2:438336773404:targetgroup/mlops-api-tg/4eecab19de56b011][0m[0m
+[0m[1mmodule.network.aws_lb_target_group.api: Destruction complete after 0s[0m
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mResource targeting is in effect[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mYou are creating a plan with the -target option, which means that the result of this plan may not represent all of the changes requested by the current configuration.
+[33m│[0m [0m
+[33m│[0m [0mThe -target option is not for routine use, and is provided only for exceptional situations such as recovering from errors or mistakes, or when Terraform specifically suggests to use it as part of an error message.
+[33m╵[0m[0m
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mApplied changes may be incomplete[0m
+[33m│[0m [0m
+[33m│[0m [0m[0mThe plan was created with the -target option in effect, so some changes requested in the configuration may have been ignored and the output values may not be fully updated. Run the following command to verify that no other changes are pending:
+[33m│[0m [0m    terraform plan
+[33m│[0m [0m
+[33m│[0m [0mNote that the -target option is not suitable for routine use, and is provided only for exceptional situations such as recovering from errors or mistakes, or when Terraform specifically suggests to use it as part of an error message.
+[33m╵[0m[0m
+[0m[1m[32m
+Destroy complete! Resources: 1 destroyed.
+[0m
